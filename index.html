@@ -3,83 +3,354 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sianap — India's AI Community</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Sianap — Where India Trains, Tests &amp; Talks AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
-body {
-  background: #f0f0f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  font-family: 'Inter', sans-serif;
+/* ═══════════════════════════════════════════
+   SIANAP — FULL VIEWPORT WEB APP
+═══════════════════════════════════════════ */
+
+:root {
+  --bg: #f6f6fb;
+  --card: #ffffff;
+  --card2: #f0f0f8;
+  --text: #111827;
+  --sub: #6b7280;
+  --border: #e5e7eb;
+  --chip-bg: #e5e7eb;
+  --chip-col: #374151;
+  --accent: #6366f1;
+  --accent2: #FF9933;
+  --nav-h: 60px;
+  --sidebar-w: 220px;
+  --max-feed: 680px;
 }
 
-/* Phone */
-.phone {
-  width: 375px;
-  height: 812px;
-  background: #f8f8fc;
-  border-radius: 52px;
-  border: 1px solid #ddd;
-  box-shadow: 0 40px 80px rgba(0,0,0,0.18), 0 0 0 8px #e8e8ee;
-  position: relative;
-  overflow: hidden;
+html, body {
+  height: 100%;
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+}
+
+/* ── SPLASH ── */
+#splash {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #07070f;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity .65s ease, visibility .65s ease;
+}
+#splash.out { opacity:0; visibility:hidden; pointer-events:none; }
+.sp-icon {
+  width:88px; height:88px; border-radius:26px;
+  background:linear-gradient(135deg,#6366f1 0%,#a855f7 50%,#FF9933 100%);
+  display:flex; align-items:center; justify-content:center;
+  font-size:44px; margin-bottom:30px;
+  box-shadow:0 0 70px rgba(99,102,241,0.6),0 0 140px rgba(255,153,51,0.2);
+  animation:sp-breathe 2.4s ease-in-out infinite;
+}
+@keyframes sp-breathe {
+  0%,100%{transform:scale(1);   box-shadow:0 0 70px rgba(99,102,241,0.6),0 0 140px rgba(255,153,51,0.2);}
+  50%    {transform:scale(1.05);box-shadow:0 0 100px rgba(99,102,241,0.9),0 0 200px rgba(255,153,51,0.4);}
+}
+.sp-word-wrap { height:64px; overflow:hidden; margin-bottom:8px; }
+.sp-word {
+  font-size:52px; font-weight:900; letter-spacing:-2px;
+  background:linear-gradient(90deg,#c0c0ff 0%,#FF9933 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  display:block; text-align:center;
+  animation:sp-in .42s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes sp-in {
+  from{transform:translateY(64px) scale(.92);opacity:0;filter:blur(6px);}
+  to  {transform:translateY(0) scale(1);     opacity:1;filter:blur(0);}
+}
+.sp-lang {
+  font-size:11px; font-weight:600; letter-spacing:3px;
+  color:#2a2a3e; text-transform:uppercase; text-align:center;
+  min-height:18px; margin-bottom:28px; transition:opacity .2s;
+}
+.sp-lang.fade{opacity:0;}
+.sp-dots{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.sp-dot{width:7px;height:7px;border-radius:50%;animation:sp-pip 1.4s ease-in-out infinite;}
+.sp-dot:nth-child(1){background:#6366f1;animation-delay:0s;}
+.sp-dot:nth-child(2){background:#a855f7;animation-delay:.2s;}
+.sp-dot:nth-child(3){background:#FF9933;animation-delay:.4s;}
+@keyframes sp-pip{0%,100%{opacity:.2;transform:scale(.6);}50%{opacity:1;transform:scale(1.3);}}
+.sp-ai-label {
+  font-size:11px; color:#2a2a3e; letter-spacing:2px; font-weight:600;
+  text-transform:uppercase; text-align:center; margin-bottom:36px;
+  min-height:16px; transition:opacity .2s;
+}
+.sp-ai-label.fade{opacity:0;}
+.sp-bar{width:200px;height:2px;background:#111827;border-radius:2px;overflow:hidden;}
+.sp-fill{height:100%;width:0%;background:linear-gradient(90deg,#6366f1,#a855f7,#FF9933);border-radius:2px;transition:width .18s linear;}
+
+/* ── APP SHELL ── */
+#app {
+  display: none;
+  min-height: 100vh;
+  background: var(--bg);
+}
+#app.on { display: flex; flex-direction: column; }
+
+/* ── TOP HEADER ── */
+.app-topbar {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  height: var(--nav-h);
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 clamp(12px,3vw,24px);
+  gap: 12px;
+}
+.app-topbar-logo {
+  display:flex; align-items:center; gap:8px; text-decoration:none; flex-shrink:0;
+}
+.app-topbar-logo-icon {
+  width:32px; height:32px; border-radius:10px;
+  background:linear-gradient(135deg,#6366f1,#FF9933);
+  display:flex; align-items:center; justify-content:center; font-size:16px;
+}
+.app-topbar-logo-name {
+  font-size:18px; font-weight:900; letter-spacing:-.5px; color:#111;
+}
+.app-topbar-spacer { flex:1; }
+.app-topbar-actions { display:flex; align-items:center; gap:8px; }
+
+/* ── LAYOUT ── */
+.app-layout {
+  display: flex;
+  padding-top: var(--nav-h);
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR (desktop) ── */
+.app-sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  position: fixed;
+  top: var(--nav-h);
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 16px 12px;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
+  gap: 4px;
+}
+.app-sidebar::-webkit-scrollbar { display:none; }
+
+.sn-item {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 14px; border-radius:14px;
+  cursor:pointer; transition:background .15s, color .15s;
+  font-size:14px; font-weight:500; color:var(--sub);
+  border:none; background:transparent; width:100%; text-align:left;
+}
+.sn-item:hover { background:var(--card2); color:var(--text); }
+.sn-item.active { background: linear-gradient(135deg,rgba(99,102,241,0.12),rgba(99,102,241,0.06)); color:var(--accent); font-weight:600; }
+.sn-item .sn-icon { font-size:20px; flex-shrink:0; }
+.sn-badge {
+  margin-left:auto; font-size:10px; font-weight:700;
+  background:#f43f5e; color:#fff; padding:2px 7px; border-radius:20px;
 }
 
-/* Notch */
-.notch {
-  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: 120px; height: 34px;
-  background: #111;
-  border-radius: 0 0 20px 20px;
-  z-index: 100;
+/* ── MAIN CONTENT ── */
+.app-main {
+  flex:1;
+  margin-left: var(--sidebar-w);
+  min-width:0;
+  display:flex;
+  justify-content:center;
+}
+.app-feed-wrap {
+  width:100%;
+  max-width: var(--max-feed);
+  padding: 20px 0 100px;
 }
 
-/* Status */
-.statusbar {
-  height: 48px;
-  display: flex; align-items: flex-end; justify-content: space-between;
-  padding: 0 24px 8px;
-  flex-shrink: 0;
+/* Tabs — now fills app-main */
+.tab { display:none; animation:up .22s ease; width:100%; }
+.tab.active { display:block; }
+@keyframes up { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+@keyframes liveblink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+@keyframes spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+
+/* Page headers scale up for desktop */
+.page-title { font-size:clamp(22px,3vw,30px); padding:20px 20px 4px; }
+.page-sub   { font-size:14px; padding:0 20px 16px; }
+
+/* Cards stretch more on big screens */
+.card,.compose,.ai-box,.prompt-card,.mcard,.ncard,.scard,.chart-card,.cal-grid,.phase,.sched,.vid-cell,.notif.unread,.notif {
+  background:var(--card); transition:background .3s;
 }
-.time { font-size: 15px; font-weight: 600; color: #111; }
-.icons { font-size: 13px; color: #111; }
+.snippet,.pc-body,.sug,.compose textarea { background:var(--card2); transition:background .3s; }
+.page-title,.post-name,.pc-name,.ph-title,.sched-name,.mtitle,.vid-title { color:var(--text); }
+.post-time,.post-text,.pc-meta,.ph-desc,.slbl,.vid-meta,.sched-pl,.nt,.ntitle { color:var(--sub); }
+.chip { background:var(--chip-bg); color:var(--chip-col); }
+.chip.on { background:#111; color:#fff; }
+.compose textarea { color:var(--text); }
+.sug { color:var(--text); }
+.section-label { color:var(--sub); }
 
-/* Screen */
-.screen {
-  flex: 1; overflow-y: auto; overflow-x: hidden;
-  scrollbar-width: none;
-  padding-bottom: 80px;
+/* ── BOTTOM NAV (mobile only) ── */
+.bottom-nav {
+  display:none;
+  position:fixed; bottom:0; left:0; right:0;
+  height:62px;
+  background:rgba(255,255,255,0.96);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  z-index:100;
+  padding: 6px 0 8px;
 }
-.screen::-webkit-scrollbar { display: none; }
+.ni {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; gap:2px;
+  cursor:pointer; padding:2px 0;
+}
+.ni-icon { font-size:20px; line-height:1; position:relative; }
+.ni-lbl  { font-size:10px; color:#bbb; font-weight:500; }
+.ni.active .ni-lbl  { color:var(--accent); font-weight:700; }
+.ni.active .ni-icon { filter:none; }
+.nbadge  { position:absolute; top:-2px; right:-4px; width:7px; height:7px; border-radius:50%; background:#f43f5e; border:1.5px solid #fff; }
 
-/* Tabs */
-.tab { display: none; animation: up .25s ease; }
-.tab.active { display: block; }
-/* Indic script rendering */
-#tab-feed .post-text,
-#tab-feed .post-name,
-#tab-feed .post-time,
-#tab-feed .pc-name,
-#tab-feed .pc-body,
-#tab-feed .pc-meta,
-#tab-feed .vid-title,
-#tab-feed .pact { font-family: inherit; }
+/* Modal overlay becomes fixed */
+#modal-overlay {
+  position: fixed !important;
+  z-index: 500 !important;
+}
+#modal-sheet {
+  max-width: 520px;
+  margin: 0 auto;
+  border-radius: 24px 24px 0 0;
+}
 
-#tab-feed .post-text { font-size: 14px; line-height: 1.65; }
+/* ── DARK MODE ── */
+body.dark {
+  --bg: #0d0d14;
+  --card: #1c1c2a;
+  --card2: #13131e;
+  --text: #e8e8f4;
+  --sub: #8888a8;
+  --border: #2e2e42;
+  --chip-bg: #22223a;
+  --chip-col: #a0a0c4;
+}
+body.dark .app-topbar {
+  background: rgba(13,13,20,0.92);
+}
+body.dark .app-sidebar {
+  background: var(--bg);
+}
+body.dark .bottom-nav {
+  background: rgba(13,13,20,0.97);
+}
+body.dark .sn-item { color:var(--sub); }
+body.dark .sn-item:hover { background:var(--card); color:var(--text); }
+body.dark .sn-item.active { background:rgba(99,102,241,0.15); color:#8888f8; }
+body.dark .chip.on { background:#6366f1; color:#fff; }
+body.dark .app-topbar-logo-name { color:#e8e8f4; }
+/* propagate dark to all existing dark selectors */
+body.dark .card,
+body.dark .prompt-card,
+body.dark .mcard,
+body.dark .ncard,
+body.dark .compose,
+body.dark .ai-box,
+body.dark .chart-card,
+body.dark .scard,
+body.dark .phase,
+body.dark .sched,
+body.dark .vid-cell,
+body.dark .notif,
+body.dark .settings-card,
+body.dark .translate-bar { background:var(--card) !important; border-color:var(--border) !important; }
+body.dark .snippet,
+body.dark .pc-body,
+body.dark .sug,
+body.dark .compose textarea,
+body.dark .comment-panel,
+body.dark .comment-input-row { background:var(--card2) !important; }
+body.dark .comment-input { background:#22223a !important; color:var(--text) !important; }
+body.dark .comment-name { color:var(--text) !important; }
+body.dark .comment-text { color:var(--sub) !important; }
+body.dark .post-name,.dark .pc-name,.dark .page-title,.dark .vid-title,.dark .prof-name,.dark .mtitle,.dark .ph-title,.dark .sched-name { color:var(--text) !important; }
+body.dark .post-text { color:var(--sub) !important; }
+body.dark [style*="color:#111"] { color:var(--text) !important; }
+body.dark [style*="color:#333"] { color:#c4c4dc !important; }
+body.dark [style*="color:#555"] { color:var(--sub) !important; }
+body.dark [style*="color:#aaa"],[style*="color:#999"],[style*="color:#bbb"],[style*="color:#ccc"] { }
+body.dark [style*="background:#fff;"],body.dark [style*="background: #fff"] { background:var(--card) !important; }
+body.dark [style*="background:#f8f8fc"],body.dark [style*="background:#f0f0f5"],body.dark [style*="background:#eee"] { background:var(--card2) !important; }
+body.dark #tab-profile [style*="color:#111"] { color:var(--text) !important; }
+body.dark #tab-profile [style*="color:#aaa"],body.dark #tab-profile [style*="color:#999"],body.dark #tab-profile [style*="color:#555"] { color:var(--sub) !important; }
+body.dark #tab-profile [style*="background:#fff"] { background:var(--card) !important; }
+body.dark #tab-profile [style*="background:#f8f8fc"],body.dark #tab-profile [style*="background:#f0f0f5"] { background:var(--card2) !important; }
+body.dark #tab-profile [style*="border-bottom"] { border-color:var(--border) !important; }
+body.dark .cal-nav button { background:var(--card2); color:var(--text); }
+body.dark .post-actions { border-top-color:var(--border) !important; }
+body.dark .pact { color:#555 !important; border-right-color:var(--border) !important; }
+body.dark .pact.liked { color:#f43f5e !important; }
+body.dark .pact.saved { color:#6366f1 !important; }
+body.dark .settings-card { background:var(--card) !important; }
+body.dark .settings-card > div { border-color:var(--border) !important; }
 
-/* Slightly larger for dense Indic scripts */
-#tab-feed[lang-script="indic"] .post-text { font-size: 15px; line-height: 1.8; letter-spacing: 0.01em; }
+/* ═══════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+═══════════════════════════════════════════ */
 
-@keyframes up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+/* Tablet and up — show sidebar */
+@media (min-width: 768px) {
+  .app-sidebar { display:flex; }
+  .app-main { margin-left: var(--sidebar-w); }
+  .bottom-nav { display:none !important; }
+  .app-feed-wrap { padding: 24px 20px 80px; }
+}
 
-/* ── Shared ── */
+/* Wide — wider sidebar, more content breathing room */
+@media (min-width: 1200px) {
+  :root { --sidebar-w: 240px; --max-feed: 720px; }
+  .app-feed-wrap { padding: 28px 24px 80px; }
+}
+@media (min-width: 1600px) {
+  :root { --sidebar-w: 260px; --max-feed: 780px; }
+}
+
+/* Mobile — no sidebar, bottom nav */
+@media (max-width: 767px) {
+  :root { --nav-h: 54px; }
+  .app-sidebar { display:none !important; }
+  .app-main { margin-left: 0 !important; }
+  .bottom-nav { display:flex !important; }
+  .app-feed-wrap { padding: 12px 0 80px; }
+  .card,.mcard,.ncard,.sched,.phase,.compose,.ai-box,.chart-card { margin-left:12px; margin-right:12px; }
+  .stat-grid { padding: 0 12px 4px; }
+  .chips { padding: 0 12px 14px; }
+  .page-title { padding: 16px 14px 4px; font-size:22px; }
+  .page-sub { padding: 0 14px 12px; }
+  .section-label { padding: 12px 14px 6px; }
+}
+
+/* Small mobile */
+@media (max-width: 399px) {
+  .app-topbar-logo-name { font-size:16px; }
+  .ni-lbl { font-size:9px; }
+}
+
+
+/* ══════════════════════════════════════════════
+   COMPONENT CSS — cards, posts, badges, prompts,
+   calendar, stats, meetups, news, notifs, etc.
+══════════════════════════════════════════════ */
+
 .page-title {
   font-size: 26px; font-weight: 700; color: #111;
   padding: 20px 20px 4px;
@@ -716,48 +987,192 @@ body {
 .gc { background: linear-gradient(135deg,#fff3e0,#ffe0b2); }
 .gd { background: linear-gradient(135deg,#e3f2fd,#bbdefb); }
 .ge { background: linear-gradient(135deg,#fce4ec,#f8bbd0); }
+
+
+/* ══════════════════════════════════════════════
+   DARK MODE — COMPONENT OVERRIDES
+══════════════════════════════════════════════ */
+
+
+
+/* Notch */
+.notch {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: #111;
+  border-radius: 0 0 20px 20px;
+  z-index: 100;
+}
+
+/* Status */
+.statusbar {
+  height: 48px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 24px 8px;
+  flex-shrink: 0;
+}
+.time { font-size: 15px; font-weight: 600; color: #111; }
+.icons { font-size: 13px; color: #111; }
+
+/* Screen */
+.screen {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: none;
+  padding-bottom: 80px;
+}
+.screen::-webkit-scrollbar { display: none; }
+
+/* Tabs */
+.tab { display: none; animation: up .25s ease; }
+.tab.active { display: block; }
+/* Indic script rendering */
+#tab-feed .post-text,
+#tab-feed .post-name,
+#tab-feed .post-time,
+#tab-feed .pc-name,
+#tab-feed .pc-body,
+#tab-feed .pc-meta,
+#tab-feed .vid-title,
+#tab-feed .pact { font-family: inherit; }
+
+#tab-feed .post-text { font-size: 14px; line-height: 1.65; }
+
+/* Slightly larger for dense Indic scripts */
+#tab-feed[lang-script="indic"] .post-text { font-size: 15px; line-height: 1.8; letter-spacing: 0.01em; }
+
+@keyframes up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+
+/* ── Shared ── */
+
+
+/* ── Additional web-specific overrides ── */
+.post-img { border-radius:12px; overflow:hidden; width:100%; }
+.card { border-radius:18px; box-shadow:0 2px 12px rgba(0,0,0,0.06); margin-bottom:12px; overflow:hidden; }
+.ncard { border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+.mcard { border-radius:18px; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+.stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 0 4px; }
+.scard { border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+.chart-card { border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-bottom:12px; }
+.phase { border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05); margin-bottom:12px; }
+.sched { border-radius:14px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:8px; }
+.compose { border-radius:18px; box-shadow:0 2px 12px rgba(0,0,0,0.06); margin-bottom:12px; }
+.ai-box { border-radius:18px; box-shadow:0 2px 12px rgba(0,0,0,0.06); margin-bottom:12px; }
+.vid-cell { border-radius:14px; overflow:hidden; }
+.prompt-card { border-radius:18px; box-shadow:0 2px 12px rgba(0,0,0,0.06); margin:0 0 12px; }
+.cal-grid { border-radius:18px; box-shadow:0 2px 12px rgba(0,0,0,0.06); margin-bottom:12px; }
+.notif { border-radius:16px; margin-bottom:4px; }
+.notif.unread { box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+
+/* Remove old phone-specific .card margins for web — use padding instead */
+.app-feed-wrap .card,
+.app-feed-wrap .compose,
+.app-feed-wrap .ai-box,
+.app-feed-wrap .prompt-card,
+.app-feed-wrap .mcard,
+.app-feed-wrap .ncard,
+.app-feed-wrap .phase,
+.app-feed-wrap .sched,
+.app-feed-wrap .chart-card,
+.app-feed-wrap .cal-grid,
+.app-feed-wrap .stat-grid,
+.app-feed-wrap .notif,
+.app-feed-wrap .notif.unread {
+  /* keep existing margins from original CSS, they work fine */
+}
+
+/* Ensure page-title uses var(--text) */
+.page-title { color: var(--text) !important; font-size: clamp(20px,3vw,28px); }
+.page-sub { color: var(--sub) !important; }
+.section-label { color: var(--sub) !important; }
+
+/* Modal fix for web */
+#modal-overlay { position:fixed !important; z-index:9000 !important; }
+#modal-sheet {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  max-width: 560px;
+  margin: 0 auto;
+  border-radius: 24px 24px 0 0;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
 </style>
 </head>
 <body>
-<div class="phone" style="--bg:#f8f8fc;--card:#fff;--card2:#f8f8fc;--text:#111;--sub:#999;--border:#eee;--chip-bg:#ebebf0;--chip-col:#555;">
 
-  <div class="notch"></div>
-
-  <div class="statusbar">
-    <div class="time">9:41</div>
-    <div class="icons">▲▲ 🔋</div>
+<!-- ═══ SPLASH ═══ -->
+<div id="splash">
+  <div class="sp-icon">🇮🇳</div>
+  <div class="sp-word-wrap"><span class="sp-word" id="sp-word">Sianap</span></div>
+  <div class="sp-lang" id="sp-lang">AI Community for Bharat</div>
+  <div class="sp-dots">
+    <div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div>
   </div>
+  <div class="sp-ai-label" id="sp-ai">Initialising…</div>
+  <div class="sp-bar"><div class="sp-fill" id="sp-fill"></div></div>
+</div>
 
-  <div class="screen">
+<!-- ═══ APP ═══ -->
+<div id="app" style="--bg:#f6f6fb;--card:#fff;--card2:#f0f0f8;--text:#111827;--sub:#6b7280;--border:#e5e7eb;--chip-bg:#e5e7eb;--chip-col:#374151;">
+
+  <!-- TOP BAR -->
+  <header class="app-topbar">
+    <a class="app-topbar-logo" href="#">
+      <div class="app-topbar-logo-icon">🇮🇳</div>
+      <div class="app-topbar-logo-name">Sianap</div>
+    </a>
+    <div class="app-topbar-spacer"></div>
+    <div class="app-topbar-actions">
+      <!-- Notifications bell -->
+      <div onclick="go('notifs',document.querySelector('.sn-item[onclick*=\"notifs\"]'))" style="position:relative;width:34px;height:34px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:1px solid var(--border);">
+        🔔
+        <span id="topbar-notif-badge" style="position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;border-radius:10px;background:#f43f5e;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg,#f6f6fb);">3</span>
+      </div>
+      <!-- Dark mode -->
+      <div onclick="toggleDark()" id="dark-btn" style="width:34px;height:34px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:1px solid var(--border);">🌙</div>
+      <!-- Language selector -->
+      <div style="position:relative;">
+        <select id="langSelect" onchange="setLang(this.value)" style="appearance:none;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 26px 6px 10px;font-size:12px;font-weight:600;color:var(--text);outline:none;cursor:pointer;">
+          <option value="en">🌐 EN</option>
+          <option value="hi">🇮🇳 हिंदी</option>
+          <option value="pa">ਪੰਜਾਬੀ</option>
+          <option value="ta">தமிழ்</option>
+          <option value="kn">ಕನ್ನಡ</option>
+          <option value="te">తెలుగు</option>
+          <option value="mr">मराठी</option>
+        </select>
+        <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--sub);pointer-events:none;">▾</span>
+      </div>
+      <!-- Avatar -->
+      <div onclick="go('profile',document.querySelector('.sn-item:last-child'))" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#FF9933);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;cursor:pointer;">AS</div>
+    </div>
+  </header>
+
+  <!-- LAYOUT -->
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="app-sidebar">
+      <div class="sn-item active" onclick="go('feed',this)"><span class="sn-icon">🏠</span> Feed</div>
+      <div class="sn-item" onclick="go('images',this)"><span class="sn-icon">📚</span> Library</div>
+      <div class="sn-item" onclick="go('post',this)"><span class="sn-icon">✏️</span> Create</div>
+      <div class="sn-item" onclick="go('meetup',this)"><span class="sn-icon">🗓️</span> Meetups</div>
+      <div class="sn-item" onclick="go('news',this)"><span class="sn-icon">📰</span> News</div>
+      <div class="sn-item" onclick="go('calendar',this)"><span class="sn-icon">📅</span> Schedule</div>
+      <div class="sn-item" onclick="go('analytics',this)"><span class="sn-icon">📊</span> Stats</div>
+      <div class="sn-item" onclick="go('notifs',this)"><span class="sn-icon">🔔</span> Alerts <span class="sn-badge">3</span></div>
+      <div class="sn-item" onclick="go('profile',this)"><span class="sn-icon">👤</span> Profile</div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="app-main">
+      <div class="app-feed-wrap">
+
 
     <!-- FEED -->
     <div class="tab active" id="tab-feed">
-      <div class="app-head" style="padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:22px;font-weight:800;color:var(--text);">Sianap 🇮🇳</div>
-          <div style="font-size:11px;color:var(--sub);margin-top:1px;">Where India Trains, Tests & Talks AI</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
-          <!-- Dark mode toggle -->
-          <div onclick="toggleDark()" id="dark-btn" style="width:32px;height:32px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:1px solid var(--border);">🌙</div>
-          <!-- Language selector -->
-          <div style="position:relative;">
-            <select id="langSelect" onchange="setLang(this.value)" style="appearance:none;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:5px 24px 5px 8px;font-size:11px;font-weight:600;color:var(--text);outline:none;cursor:pointer;max-width:90px;">
-              <option value="en">🌐 EN</option>
-              <option value="hi">🇮🇳 हिंदी</option>
-              <option value="pa">ਪੰਜਾਬੀ</option>
-              <option value="ta">தமிழ்</option>
-              <option value="kn">ಕನ್ನಡ</option>
-              <option value="te">తెలుగు</option>
-              <option value="mr">मराठी</option>
-            </select>
-            <span style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--sub);pointer-events:none;">▾</span>
-          </div>
-          <!-- Profile avatar -->
-          <div onclick="go('profile',document.querySelector('.ni:last-child'))" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#FF9933);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;">AS</div>
-        </div>
-      </div>
-
       <!-- Language banner (hidden by default) -->
       <div id="lang-banner" style="display:none;margin:0 16px 10px;background:#f0f0ff;border:1px solid #ddd5ff;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px;">
         <span style="font-size:16px;">🌐</span>
@@ -773,9 +1188,115 @@ body {
         <div class="chip" onclick="feedFilter('audio', this)">🎙️ Audio</div>
         <div class="chip" onclick="feedFilter('indic', this)">🇮🇳 Indic Models</div>
         <div class="chip" onclick="feedFilter('discuss', this)">💬 Discuss</div>
+        <div class="chip" onclick="feedFilter('live', this)" style="background:linear-gradient(135deg,#f43f5e,#ff6b6b);color:#fff;display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:50%;background:#fff;display:inline-block;animation:liveblink 1s infinite;"></span>🔴 AI Live</div>
+        <div class="chip" onclick="feedFilter('saved', this)" id="chip-saved" style="display:flex;align-items:center;gap:5px;">🔖 Saved <span id="saved-count-badge" style="display:none;background:#6366f1;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;"></span></div>
+      </div>
+
+      <!-- AI LIVE section (hidden by default) -->
+      <div id="feed-live" style="display:none;">
+        <div style="padding:12px 16px 6px;font-size:12px;font-weight:700;color:#f43f5e;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:6px;">
+          <span style="width:7px;height:7px;border-radius:50%;background:#f43f5e;animation:liveblink 1s infinite;display:inline-block;"></span>
+          AI Summits &amp; Live Events
+        </div>
+
+        <!-- Video Card 1 — Google I/O -->
+        <div style="margin:0 16px 14px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+          <!-- Thumbnail (shown first, replaced by iframe on click) -->
+          <div id="lv-thumb-1" onclick="playLiveVideo('1','XEzRZ35urlk')" style="background:linear-gradient(135deg,#1a1a2e,#16213e);height:200px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;">
+            <img src="https://img.youtube.com/vi/XEzRZ35urlk/hqdefault.jpg" alt="Google I/O 2024" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">
+            <div style="position:relative;z-index:1;width:64px;height:64px;background:rgba(244,63,94,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;box-shadow:0 4px 20px rgba(244,63,94,0.5);">▶</div>
+            <div style="position:absolute;top:10px;left:10px;z-index:2;background:#f43f5e;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;animation:liveblink 1s infinite;display:inline-block;"></span>LIVE</div>
+            <div style="position:absolute;bottom:10px;right:10px;z-index:2;background:rgba(0,0,0,0.7);color:#fff;font-size:11px;padding:3px 8px;border-radius:6px;">2:12:00</div>
+          </div>
+          <!-- Iframe player (hidden until thumbnail clicked) -->
+          <div id="lv-player-1" style="display:none;position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;">
+            <iframe id="lv-iframe-1" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+          <div style="padding:12px 14px;">
+            <div style="font-size:14px;font-weight:700;color:#111;margin-bottom:4px;">Google I/O 2024 — AI &amp; Gemini Keynote</div>
+            <div style="font-size:12px;color:#999;margin-bottom:10px;">Google for Developers · 2.1M views · May 14, 2024</div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="playLiveVideo('1','XEzRZ35urlk')" style="flex:1;padding:9px;border-radius:12px;background:#f43f5e;color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">▶ Watch Now</button>
+              <div style="padding:9px 14px;border-radius:12px;background:#f0f0f8;font-size:13px;font-weight:600;color:#6366f1;cursor:pointer;">🔖</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Card 2 — Microsoft Build -->
+        <div style="margin:0 16px 14px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+          <div id="lv-thumb-2" onclick="playLiveVideo('2','8OViuvkZDlk')" style="background:linear-gradient(135deg,#0078d4,#00b4d8);height:200px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;">
+            <img src="https://img.youtube.com/vi/8OViuvkZDlk/hqdefault.jpg" alt="Microsoft Build 2024" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">
+            <div style="position:relative;z-index:1;width:64px;height:64px;background:rgba(0,120,212,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;border:2px solid rgba(255,255,255,0.6);">▶</div>
+            <div style="position:absolute;top:10px;right:10px;z-index:2;background:#0078d4;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">Microsoft</div>
+            <div style="position:absolute;bottom:10px;right:10px;z-index:2;background:rgba(0,0,0,0.7);color:#fff;font-size:11px;padding:3px 8px;border-radius:6px;">1:58:00</div>
+          </div>
+          <div id="lv-player-2" style="display:none;position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;">
+            <iframe id="lv-iframe-2" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+          <div style="padding:12px 14px;">
+            <div style="font-size:14px;font-weight:700;color:#111;margin-bottom:4px;">Microsoft Build 2024 — Copilot &amp; AI</div>
+            <div style="font-size:12px;color:#999;margin-bottom:10px;">Microsoft · 890K views · May 21, 2024</div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="playLiveVideo('2','8OViuvkZDlk')" style="flex:1;padding:9px;border-radius:12px;background:#0078d4;color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">▶ Watch Now</button>
+              <div style="padding:9px 14px;border-radius:12px;background:#f0f0f8;font-size:13px;font-weight:600;color:#6366f1;cursor:pointer;">🔖</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Card 3 — IndiaAI Mission -->
+        <div style="margin:0 16px 14px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+          <div id="lv-thumb-3" onclick="playLiveVideo('3','pMWqxMd3Pkk')" style="background:linear-gradient(135deg,#FF9933,#138808);height:200px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;">
+            <img src="https://img.youtube.com/vi/pMWqxMd3Pkk/hqdefault.jpg" alt="IndiaAI Mission Summit" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">
+            <div style="position:relative;z-index:1;width:64px;height:64px;background:rgba(255,153,51,0.88);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff;">▶</div>
+            <div style="position:absolute;top:10px;left:10px;z-index:2;background:rgba(19,136,8,0.92);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">IndiaAI Official</div>
+          </div>
+          <div id="lv-player-3" style="display:none;position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;">
+            <iframe id="lv-iframe-3" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+          <div style="padding:12px 14px;">
+            <div style="font-size:14px;font-weight:700;color:#111;margin-bottom:4px;">IndiaAI Mission Summit — Full Sessions 🇮🇳</div>
+            <div style="font-size:12px;color:#999;margin-bottom:10px;">IndiaAI Mission · Multiple sessions · Feb 2024</div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="playLiveVideo('3','pMWqxMd3Pkk')" style="flex:1;padding:9px;border-radius:12px;background:linear-gradient(135deg,#FF9933,#138808);color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">🇮🇳 Watch Now</button>
+              <div style="padding:9px 14px;border-radius:12px;background:#f0f0f8;font-size:13px;font-weight:600;color:#6366f1;cursor:pointer;">🔖</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Card 4 — OpenAI Dev Day -->
+        <div style="margin:0 16px 14px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+          <div id="lv-thumb-4" onclick="playLiveVideo('4','U9mJuUkhUzk')" style="background:linear-gradient(135deg,#111,#333);height:200px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;">
+            <img src="https://img.youtube.com/vi/U9mJuUkhUzk/hqdefault.jpg" alt="OpenAI Dev Day 2024" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display='none'">
+            <div style="position:relative;z-index:1;width:64px;height:64px;background:rgba(16,163,127,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;border:2px solid rgba(255,255,255,0.3);">▶</div>
+            <div style="position:absolute;top:10px;right:10px;z-index:2;background:#10a37f;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;">OpenAI</div>
+            <div style="position:absolute;bottom:10px;right:10px;z-index:2;background:rgba(0,0,0,0.7);color:#fff;font-size:11px;padding:3px 8px;border-radius:6px;">45:00</div>
+          </div>
+          <div id="lv-player-4" style="display:none;position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;">
+            <iframe id="lv-iframe-4" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+          <div style="padding:12px 14px;">
+            <div style="font-size:14px;font-weight:700;color:#111;margin-bottom:4px;">OpenAI Dev Day 2024 — GPT-4o &amp; More</div>
+            <div style="font-size:12px;color:#999;margin-bottom:10px;">OpenAI · 4.2M views · Nov 6, 2023</div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="playLiveVideo('4','U9mJuUkhUzk')" style="flex:1;padding:9px;border-radius:12px;background:#10a37f;color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">▶ Watch Now</button>
+              <div style="padding:9px 14px;border-radius:12px;background:#f0f0f8;font-size:13px;font-weight:600;color:#6366f1;cursor:pointer;">🔖</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:0 16px 20px;text-align:center;font-size:12px;color:#aaa;">
+          Videos play directly in Sianap · Powered by YouTube embed
+        </div>
+
       </div>
 
       <div id="feed-list"></div>
+
+      <!-- SAVED POSTS panel -->
+      <div id="feed-saved" style="display:none;">
+        <div style="padding:14px 16px 6px;font-size:12px;font-weight:700;color:#6366f1;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:6px;">🔖 Saved Posts</div>
+        <div id="saved-posts-list"></div>
+      </div>
     </div>
 
     <!-- LIBRARY -->
@@ -872,51 +1393,68 @@ body {
     <div class="tab" id="tab-notifs">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 20px 4px;">
         <div class="page-title" style="padding:0;">Notifications</div>
-        <div style="font-size:13px;color:#6366f1;font-weight:600;cursor:pointer;">Clear all</div>
+        <div onclick="clearAllNotifs()" style="font-size:13px;color:#6366f1;font-weight:600;cursor:pointer;">Clear all</div>
       </div>
       <div class="page-sub">What's happening</div>
-
-      <div class="notif unread">
-        <div class="navo" style="background:#fff3e0;">🤖</div>
-        <div class="nb"><div class="nt"><b>Sianap AI</b> scheduled your Hindi prompt post for 7:30 PM IST.</div><div class="ntm">Just now</div></div>
-        <div class="ndot"></div>
-      </div>
-      <div class="notif unread">
-        <div class="navo" style="background:#e8f5e9;">✅</div>
-        <div class="nb"><div class="nt"><b>Priya Nair</b> gave your prompt a Proof-of-AI badge.</div><div class="ntm">10 min ago</div></div>
-        <div class="ndot"></div>
-      </div>
-      <div class="notif unread">
-        <div class="navo" style="background:#f0f0ff;">⚡</div>
-        <div class="nb"><div class="nt">Your <b>Kannada prompt</b> hit 1,000 runs! 🎉</div><div class="ntm">1 hr ago</div></div>
-        <div class="ndot"></div>
-      </div>
-      <div class="notif">
-        <div class="navo" style="background:#fce4ec;">❤️</div>
-        <div class="nb"><div class="nt"><b>DevSpark India</b> and 204 others liked your post.</div><div class="ntm">3 hr ago</div></div>
-      </div>
-      <div class="notif">
-        <div class="navo" style="background:#fff8e1;">🏆</div>
-        <div class="nb"><div class="nt">You're in the <b>Top 50 AI Creators</b> on Sianap 🇮🇳</div><div class="ntm">Yesterday</div></div>
-      </div>
-      <div class="notif">
-        <div class="navo" style="background:#e3f2fd;">🏛️</div>
-        <div class="nb"><div class="nt"><b>IndiaAI Mission</b> mentioned Sianap in their newsletter.</div><div class="ntm">2 days ago</div></div>
-      </div>
+      <div id="notif-list"></div>
     </div>
 
     <!-- PROFILE -->
     <div class="tab" id="tab-profile">
 
+      <!-- Hidden file inputs -->
+      <input type="file" id="cover-file-input" accept="image/*" style="display:none" onchange="handleCoverUpload(event)">
+      <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+
       <!-- Cover -->
-      <div style="height:90px;background:linear-gradient(135deg,#6366f1,#FF9933);flex-shrink:0;position:relative;">
-        <button onclick="toggleDark()" id="dark-profile-btn" style="position:absolute;top:12px;right:12px;padding:6px 12px;border-radius:20px;background:rgba(255,255,255,0.25);color:#fff;border:1px solid rgba(255,255,255,0.4);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">🌙 Dark</button>
+      <div id="profile-cover" style="height:160px;background:linear-gradient(135deg,#6366f1,#a855f7,#FF9933);position:relative;overflow:hidden;border-radius:0 0 0 0;">
+        <img id="cover-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+        <!-- Cover upload button -->
+        <div onclick="showImageSourcePicker('cover')" style="position:absolute;bottom:10px;right:12px;display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(0,0,0,0.4);border-radius:20px;cursor:pointer;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.2);">
+          <span style="font-size:13px;">📷</span>
+          <span style="font-size:11px;font-weight:600;color:#fff;">Change Cover</span>
+        </div>
+        <!-- Dark mode btn -->
+        <button onclick="toggleDark()" id="dark-profile-btn" style="position:absolute;top:12px;right:12px;padding:6px 12px;border-radius:20px;background:rgba(0,0,0,0.3);color:#fff;border:1px solid rgba(255,255,255,0.3);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;backdrop-filter:blur(8px);">🌙 Dark</button>
       </div>
 
-      <!-- Avatar row -->
-      <div style="padding:0 20px;margin-top:-30px;margin-bottom:8px;display:flex;align-items:flex-end;justify-content:space-between;">
-        <div id="profile-avatar" onclick="openModal('editProfile')" style="width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#FF9933);border:3px solid #f8f8fc;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;cursor:pointer;">AS</div>
-        <button onclick="openModal('editProfile')" style="padding:8px 18px;border-radius:20px;background:#6366f1;color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✏️ Edit Profile</button>
+      <!-- Avatar row — sits ON the cover bottom edge -->
+      <div style="padding:0 20px;display:flex;align-items:flex-end;justify-content:space-between;margin-top:-44px;position:relative;z-index:2;">
+        <!-- Avatar with upload ring -->
+        <div style="position:relative;display:inline-block;">
+          <div id="profile-avatar" style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#FF9933);border:4px solid var(--bg,#f6f6fb);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+            <span id="av-initials">AS</span>
+            <img id="av-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+          </div>
+          <!-- Camera badge -->
+          <div onclick="showImageSourcePicker('avatar')" style="position:absolute;bottom:2px;right:2px;width:26px;height:26px;border-radius:50%;background:#6366f1;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid var(--bg,#f6f6fb);font-size:13px;">📷</div>
+        </div>
+        <div style="padding-bottom:8px;display:flex;gap:8px;">
+          <button onclick="openModal('editProfile')" style="padding:8px 18px;border-radius:20px;background:#6366f1;color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✏️ Edit Profile</button>
+        </div>
+      </div>
+
+      <!-- Image source picker modal (inline) -->
+      <div id="img-source-picker" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.5);align-items:flex-end;justify-content:center;">
+        <div style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:520px;padding:20px 20px 32px;">
+          <div style="width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:0 auto 20px;"></div>
+          <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:16px;" id="img-picker-title">Choose Photo</div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <div onclick="pickImageSource('camera')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#f5f5ff'" onmouseout="this.style.background=''">
+              <span style="font-size:22px;">📷</span><div><div style="font-size:14px;font-weight:600;color:#111;">Camera</div><div style="font-size:12px;color:#999;">Take a new photo</div></div>
+            </div>
+            <div onclick="pickImageSource('gallery')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#f5f5ff'" onmouseout="this.style.background=''">
+              <span style="font-size:22px;">🖼️</span><div><div style="font-size:14px;font-weight:600;color:#111;">Photo Gallery / Desktop</div><div style="font-size:12px;color:#999;">Upload from your device</div></div>
+            </div>
+            <div onclick="pickImageSource('drive')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#f5f5ff'" onmouseout="this.style.background=''">
+              <span style="font-size:22px;">📁</span><div><div style="font-size:14px;font-weight:600;color:#111;">Google Drive</div><div style="font-size:12px;color:#999;">Choose from Drive</div></div>
+            </div>
+            <div onclick="pickImageSource('url')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;cursor:pointer;transition:background .15s;" onmouseover="this.style.background='#f5f5ff'" onmouseout="this.style.background=''">
+              <span style="font-size:22px;">🔗</span><div><div style="font-size:14px;font-weight:600;color:#111;">Paste Image URL</div><div style="font-size:12px;color:#999;">From web or cloud link</div></div>
+            </div>
+          </div>
+          <button onclick="closeImagePicker()" style="width:100%;margin-top:16px;padding:13px;border-radius:14px;background:#f0f0f8;color:#555;border:none;font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>
+        </div>
       </div>
 
       <!-- Name & stats -->
@@ -988,17 +1526,22 @@ body {
     </div>
 
     <!-- ══ MODALS OVERLAY ══ -->
-    <div id="modal-overlay" onclick="if(event.target===this)closeModal()" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:flex-end;">
+    <div id="modal-overlay" onclick="if(event.target===this)closeModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:flex-end;">
       <div id="modal-sheet" style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-height:88%;overflow-y:auto;padding-bottom:24px;transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);">
         <div style="width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:10px auto 0;"></div>
         <div id="modal-content"></div>
       </div>
     </div>
 
-  </div><!-- /screen -->
 
-  <!-- Bottom Nav -->
-  <div class="bottom-nav">
+
+      </div><!-- /app-feed-wrap -->
+    </main><!-- /app-main -->
+
+  </div><!-- /app-layout -->
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav class="bottom-nav">
     <div class="ni active" onclick="go('feed',this)"><div class="ni-icon">🏠</div><div class="ni-lbl">Feed</div></div>
     <div class="ni" onclick="go('images',this)"><div class="ni-icon">📚</div><div class="ni-lbl">Library</div></div>
     <div class="ni" onclick="go('post',this)"><div class="ni-icon">✏️</div><div class="ni-lbl">Create</div></div>
@@ -1011,33 +1554,14 @@ body {
       <div class="ni-lbl">Alerts</div>
     </div>
     <div class="ni" onclick="go('profile',this)"><div class="ni-icon">👤</div><div class="ni-lbl">Profile</div></div>
-  </div>
+  </nav>
 
-  <div class="home-pill"></div>
-</div>
+</div><!-- /app -->
 
 <script>
-function go(id, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
-  const tab = document.getElementById('tab-' + id);
-  if (tab) tab.classList.add('active');
-  if (el) el.classList.add('active');
-  document.querySelector('.screen').scrollTop = 0;
-}
+// go() overridden below
 
-// ── Dark Mode ──
-let isDark = false;
-function toggleDark() {
-  isDark = !isDark;
-  document.querySelector('.phone').classList.toggle('dark', isDark);
-  const icon = isDark ? '☀️' : '🌙';
-  const label = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
-  const btn = document.getElementById('dark-btn');
-  const pbtn = document.getElementById('dark-profile-btn');
-  if (btn) btn.textContent = icon;
-  if (pbtn) pbtn.textContent = label;
-}
+// toggleDark overridden below
 
 // ── Toggle switch helper ──
 function toggleSwitch(el) {
@@ -1193,7 +1717,7 @@ function getComments(postId) {
 function renderComments(postId) {
   const comments = getComments(postId);
   return comments.map(c => `
-    <div class="comment-item">
+    <div class="comment-item" id="ci-${postId}-${c.av}-${Math.random().toString(36).slice(2,6)}">
       <div class="comment-av" style="background:${c.color};color:#fff;">${c.av}</div>
       <div style="flex:1;min-width:0;">
         <div class="comment-name">${c.name}</div>
@@ -1203,7 +1727,13 @@ function renderComments(postId) {
     </div>`).join('') + `
     <div class="comment-input-row">
       <div class="comment-av" style="background:linear-gradient(135deg,#6366f1,#FF9933);color:#fff;font-size:10px;">AS</div>
-      <input class="comment-input" placeholder="Add a comment…" onkeydown="if(event.key==='Enter')submitComment(this,${postId})">
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+        <input class="comment-input" id="cinput-${postId}" placeholder="Add a comment…" onkeydown="if(event.key==='Enter')submitComment(this,${postId})">
+        <div style="display:flex;gap:6px;">
+          <button onclick="submitComment(document.getElementById('cinput-${postId}'),${postId})" style="flex:1;padding:7px;border-radius:10px;background:#6366f1;color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Post</button>
+          <button onclick="aiGenerateComment(${postId})" style="flex:1;padding:7px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#FF9933);color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">✨ AI Write</button>
+        </div>
+      </div>
     </div>`;
 }
 
@@ -1212,23 +1742,134 @@ function submitComment(input, postId) {
   if (!val) return;
   const panel = document.getElementById('comments-' + postId);
   const inputRow = panel.querySelector('.comment-input-row');
+  const cid = 'uc-' + Date.now();
   const newComment = document.createElement('div');
-  newComment.className = 'comment-item';
+  newComment.className = 'comment-item user-comment';
+  newComment.id = cid;
   newComment.innerHTML = `
     <div class="comment-av" style="background:linear-gradient(135deg,#6366f1,#FF9933);color:#fff;font-size:10px;">AS</div>
     <div style="flex:1;min-width:0;">
       <div class="comment-name">Amandeep Singh</div>
-      <div class="comment-text">${val}</div>
+      <div class="comment-text" id="ct-${cid}">${val}</div>
     </div>
-    <div class="comment-time">now</div>`;
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+      <div class="comment-time">now</div>
+      <div style="display:flex;gap:4px;">
+        <button onclick="editComment('${cid}')" style="font-size:11px;padding:3px 8px;border-radius:8px;background:#f0f0f8;color:#6366f1;border:none;cursor:pointer;font-family:inherit;font-weight:600;">✏️ Edit</button>
+        <button onclick="deleteComment('${cid}','${postId}')" style="font-size:11px;padding:3px 8px;border-radius:8px;background:#fce4ec;color:#f43f5e;border:none;cursor:pointer;font-family:inherit;font-weight:600;">🗑️ Delete</button>
+      </div>
+    </div>`;
   panel.insertBefore(newComment, inputRow);
   input.value = '';
-  // Update comment count
   const countEl = document.getElementById('ccount-' + postId);
   if (countEl) {
     const n = parseInt(countEl.textContent.replace(/\D/g,'')) || 0;
-    countEl.textContent = '💬 ' + (n + 1);
+    countEl.textContent = (n + 1);
   }
+}
+
+function editComment(cid) {
+  const textEl = document.getElementById('ct-' + cid);
+  if (!textEl) return;
+
+  // Guard: already in edit mode — just focus the existing input
+  if (document.getElementById('edit-wrap-' + cid)) {
+    const inp = document.getElementById('edit-input-' + cid);
+    if (inp) inp.focus();
+    return;
+  }
+
+  // Strip any pre-existing "Edited" badge from the name row before reading text
+  const current = textEl.textContent.trim();
+  textEl.style.display = 'none';
+
+  const wrap = document.createElement('div');
+  wrap.id = 'edit-wrap-' + cid;
+  wrap.style.cssText = 'display:flex;flex-direction:column;gap:5px;width:100%;margin-top:2px;';
+
+  const input = document.createElement('input');
+  input.id = 'edit-input-' + cid;
+  input.value = current;
+  input.style.cssText = 'width:100%;padding:7px 11px;border-radius:10px;border:1.5px solid #6366f1;font-size:13px;font-family:inherit;outline:none;background:var(--card2,#f0f0f8);color:var(--text,#111);box-sizing:border-box;';
+
+  const btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:6px;';
+
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = 'Save';
+  saveBtn.style.cssText = 'flex:1;padding:5px;border-radius:9px;background:#6366f1;color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.style.cssText = 'flex:1;padding:5px;border-radius:9px;background:#f0f0f8;color:#555;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;';
+
+  const finish = (save) => {
+    if (save) {
+      const v = input.value.trim();
+      if (!v) { textEl.style.display = ''; wrap.remove(); return; }
+      // Update the comment text (clean, no emoji suffix)
+      textEl.textContent = v;
+      // Show "Edited" badge next to the commenter name — add only once
+      const commentItem = document.getElementById(cid);
+      if (commentItem && !commentItem.querySelector('.edited-badge')) {
+        const nameEl = commentItem.querySelector('.comment-name');
+        if (nameEl) {
+          const badge = document.createElement('span');
+          badge.className = 'edited-badge';
+          badge.textContent = 'Edited';
+          badge.style.cssText = 'display:inline-block;margin-left:6px;font-size:9px;font-weight:700;color:#6366f1;background:#eef;padding:1px 7px;border-radius:20px;vertical-align:middle;letter-spacing:0.3px;border:1px solid #dddeff;';
+          nameEl.insertAdjacentElement('afterend', badge);
+        }
+      }
+    }
+    textEl.style.display = '';
+    wrap.remove();
+  };
+
+  saveBtn.onclick = () => finish(true);
+  cancelBtn.onclick = () => finish(false);
+  input.onkeydown = e => { if (e.key === 'Enter') finish(true); if (e.key === 'Escape') finish(false); };
+
+  btnRow.append(saveBtn, cancelBtn);
+  wrap.append(input, btnRow);
+  textEl.parentNode.insertBefore(wrap, textEl);
+  input.focus(); input.select();
+}
+
+function deleteComment(cid, postId) {
+  const el = document.getElementById(cid);
+  if (!el) return;
+  el.style.opacity = '0'; el.style.transform = 'translateX(20px)'; el.style.transition = 'all .25s';
+  setTimeout(() => el.remove(), 250);
+  const countEl = document.getElementById('ccount-' + postId);
+  if (countEl) {
+    const n = parseInt(countEl.textContent.replace(/\D/g,'')) || 1;
+    countEl.textContent = Math.max(0, n - 1);
+  }
+}
+
+const AI_COMMENTS = [
+  "Really insightful! The approach to Indic language models here is exactly what the ecosystem needs 🙌",
+  "This is a game-changer for regional AI accessibility. Would love to see a Hindi version of this too 🇮🇳",
+  "Excellent work! The F1 score on NER is impressive. Have you tried this with Telugu legal data as well?",
+  "The GPU subsidy angle is underrated. More startups should be leveraging IndiaAI Mission resources 💡",
+  "Fascinating thread! The performance gap between English and Indic models is closing fast. 🚀",
+  "This is exactly the kind of community-driven AI research India needs. Bookmarking this! ⭐",
+  "Would love to collaborate on extending this to Kannada datasets. Drop me a DM! 🤝",
+];
+
+function aiGenerateComment(postId) {
+  const input = document.getElementById('cinput-' + postId);
+  if (!input) return;
+  input.value = '✨ Generating…';
+  input.disabled = true;
+  input.style.color = '#6366f1';
+  setTimeout(() => {
+    input.value = AI_COMMENTS[Math.floor(Math.random() * AI_COMMENTS.length)];
+    input.disabled = false;
+    input.style.color = '';
+    input.focus();
+  }, 900);
 }
 
 function toggleLike(el, postId) {
@@ -1261,8 +1902,39 @@ function handleShare(postId) {
   setTimeout(() => el.closest('.pact').style.color = '', 600);
 }
 
-function toggleSave(el) {
-  el.classList.toggle('saved');
+// Saved posts store: postId -> post object
+const _savedPosts = {};
+
+function toggleSave(el, postId) {
+  const isSaved = el.classList.toggle('saved');
+  const source = feedByLang[currentLang] || feedByLang['en'];
+  const post = source.find(p => p.id == postId);
+
+  if (isSaved) {
+    if (post) _savedPosts[postId] = post;
+    el.innerHTML = '🔖 Saved';
+    el.style.color = '#6366f1';
+    el.style.fontWeight = '700';
+  } else {
+    delete _savedPosts[postId];
+    el.innerHTML = '🔖 Save';
+    el.style.color = '';
+    el.style.fontWeight = '';
+  }
+
+  // Update saved count badge on chip
+  const count = Object.keys(_savedPosts).length;
+  const badge = document.getElementById('saved-count-badge');
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline-block' : 'none';
+  }
+
+  // If saved panel is visible, refresh it
+  const savedPanel = document.getElementById('feed-saved');
+  if (savedPanel && savedPanel.style.display !== 'none') {
+    renderSavedPosts();
+  }
 }
 
 function postActions(p) {
@@ -1281,7 +1953,7 @@ function postActions(p) {
       <div class="pact" onclick="handleShare(${p.id})">
         🔁 <span id="scount-${p.id}" data-count="${shareCount}">${shareCount}</span>
       </div>
-      <div class="pact" onclick="toggleSave(this)">🔖 Save</div>
+      <div class="pact" onclick="toggleSave(this,${p.id})">🔖 Save</div>
     </div>
     <div class="comment-panel" id="comments-${p.id}"></div>`;
 }
@@ -2763,24 +3435,301 @@ function submitFeedback() {
   setTimeout(() => alert('Thank you for your feedback! 🙏 We\'ll review it soon.'), 400);
 }
 
-window.onload = function() {
-  renderFeed('all');
-  renderNews('all');
-  renderMeetups('all');
+// app init handled by _launch() after splash
 
-  const schedChip = document.querySelector('#tab-calendar .chip');
-  if (schedChip) scheduleFilter('today', schedChip);
+// ══ SPLASH ══
+const _SP = [
+  {w:'Sianap',    l:'English',            a:'Recognising language…'},
+  {w:'सियानप',    l:'Hindi · हिंदी',       a:'Translating with AI…'},
+  {w:'ਸਿਆਨਪ',   l:'Punjabi · ਪੰਜਾਬੀ',   a:'Processing Indic script…'},
+  {w:'சியானப்',  l:'Tamil · தமிழ்',      a:'Running NLP model…'},
+  {w:'ಸಿಯಾನಪ್', l:'Kannada · ಕನ್ನಡ',    a:'Embedding vectors…'},
+  {w:'సియానప్',  l:'Telugu · తెలుగు',   a:'Cross-lingual transfer…'},
+  {w:'सियानप',  l:'Marathi · मराठी',    a:'Bharat AI online ✓'},
+  {w:'Sianap',   l:'AI Community · Bharat', a:'Welcome 🇮🇳'},
+];
+let _si=0;
+function _spStep(){
+  if(_si>=_SP.length){setTimeout(_launch,260);return;}
+  const t=_SP[_si];
+  const lE=document.getElementById('sp-lang');
+  const aE=document.getElementById('sp-ai');
+  const wE=document.getElementById('sp-word');
+  const fE=document.getElementById('sp-fill');
+  lE.classList.add('fade'); aE.classList.add('fade');
+  setTimeout(()=>{
+    wE.style.animation='none'; wE.offsetHeight; wE.style.animation='';
+    wE.textContent=t.w; lE.textContent=t.l; aE.textContent=t.a;
+    lE.classList.remove('fade'); aE.classList.remove('fade');
+    fE.style.width=((_si+1)/_SP.length*100)+'%';
+    _si++; setTimeout(_spStep,480);
+  },130);
+}
+function _launch(){
+  document.getElementById('splash').classList.add('out');
+  const app=document.getElementById('app');
+  app.classList.add('on');
+  // Init tabs
+  renderFeed('all'); renderNews('all'); renderMeetups('all'); renderNotifs();
+  const sc=document.querySelector('#tab-calendar .chip');
+  if(sc) scheduleFilter('today',sc);
+  const st=document.querySelector('#tab-analytics .chip');
+  if(st) statsFilter('overview',st);
+  const sl=document.querySelector('#tab-images .chip');
+  if(sl) libraryFilter('prompts',sl);
+  const sp=document.querySelector('#tab-post .chip');
+  if(sp) createFilter('text',sp);
+}
+_spStep();
 
-  const statsChip = document.querySelector('#tab-analytics .chip');
-  if (statsChip) statsFilter('overview', statsChip);
+// ══ OVERRIDE go() — sync sidebar AND bottom nav ══
+function go(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sn-item,.ni').forEach(n=>n.classList.remove('active'));
+  const tab=document.getElementById('tab-'+id);
+  if(tab) tab.classList.add('active');
+  if(el) el.classList.add('active');
+  // sync the OTHER nav (sidebar vs bottom-nav)
+  document.querySelectorAll('.sn-item, .ni').forEach(n=>{
+    const fn=n.getAttribute('onclick')||'';
+    if(fn.includes("'"+id+"'")) n.classList.add('active');
+  });
+  // scroll main back to top
+  const m=document.querySelector('.app-feed-wrap');
+  if(m) m.scrollTop=0;
+  window.scrollTo(0,0);
+}
 
-  const libChip = document.querySelector('#tab-images .chip');
-  if (libChip) libraryFilter('prompts', libChip);
+// ══ OVERRIDE toggleDark() — use body.dark instead of .phone.dark ══
+let isDark=false;
+function toggleDark(){
+  isDark=!isDark;
+  document.body.classList.toggle('dark',isDark);
+  const icon=isDark?'☀️':'🌙';
+  const pbtn=document.getElementById('dark-profile-btn');
+  const dbtn=document.getElementById('dark-btn');
+  if(dbtn) dbtn.textContent=icon;
+  if(pbtn) pbtn.textContent=isDark?'☀️ Light':'🌙 Dark';
+}
 
-  const createChip = document.querySelector('#tab-post .chip');
-  if (createChip) createFilter('text', createChip);
-};
 
+// ══ PROFILE IMAGE UPLOAD ══
+let _imgTarget = 'avatar'; // 'avatar' or 'cover'
+
+function showImageSourcePicker(target) {
+  _imgTarget = target;
+  document.getElementById('img-picker-title').textContent = target === 'avatar' ? 'Choose Profile Photo' : 'Choose Cover Photo';
+  const picker = document.getElementById('img-source-picker');
+  picker.style.display = 'flex';
+}
+
+function closeImagePicker() {
+  document.getElementById('img-source-picker').style.display = 'none';
+}
+
+function pickImageSource(source) {
+  closeImagePicker();
+  if (source === 'camera' || source === 'gallery') {
+    // Trigger file input
+    const inp = document.getElementById(_imgTarget === 'avatar' ? 'avatar-file-input' : 'cover-file-input');
+    if (inp) inp.click();
+  } else if (source === 'drive') {
+    alert('Google Drive picker: In production this would open the Google Drive API picker. For now, use the file upload option.');
+  } else if (source === 'url') {
+    const url = prompt('Paste image URL:');
+    if (url) applyImageUrl(url);
+  }
+}
+
+function handleAvatarUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = document.getElementById('av-img');
+    const initials = document.getElementById('av-initials');
+    if (img) { img.src = ev.target.result; img.style.display = 'block'; }
+    if (initials) initials.style.display = 'none';
+    // Also update topbar avatar
+    const topAv = document.querySelector('.app-topbar-actions [style*="border-radius:50%"]');
+    if (topAv) {
+      topAv.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    }
+    // Update modal preview
+    const prev = document.getElementById('modal-avatar-preview');
+    if (prev) { prev.style.backgroundImage = `url(${ev.target.result})`; prev.textContent = ''; }
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleCoverUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => applyImageUrl(ev.target.result, 'cover');
+  reader.readAsDataURL(file);
+}
+
+function applyImageUrl(url, forceTarget) {
+  const tgt = forceTarget || _imgTarget;
+  if (tgt === 'cover') {
+    const coverDiv = document.getElementById('profile-cover');
+    const coverImg = document.getElementById('cover-img');
+    if (coverImg) { coverImg.src = url; coverImg.style.display = 'block'; }
+    if (coverDiv) coverDiv.style.background = 'none';
+  } else {
+    const img = document.getElementById('av-img');
+    const initials = document.getElementById('av-initials');
+    if (img) { img.src = url; img.style.display = 'block'; }
+    if (initials) initials.style.display = 'none';
+  }
+}
+
+// ══ NOTIFICATIONS ══
+let _notifs = [
+  { id:'n1', icon:'🤖', bg:'#fff3e0', text:'<b>Sianap AI</b> scheduled your Hindi prompt post for 7:30 PM IST.', time:'Just now',    unread:true  },
+  { id:'n2', icon:'✅', bg:'#e8f5e9', text:'<b>Priya Nair</b> gave your prompt a Proof-of-AI badge.',           time:'10 min ago', unread:true  },
+  { id:'n3', icon:'⚡', bg:'#f0f0ff', text:'Your <b>Kannada prompt</b> hit 1,000 runs! 🎉',                     time:'1 hr ago',   unread:true  },
+  { id:'n4', icon:'❤️', bg:'#fce4ec', text:'<b>DevSpark India</b> and 204 others liked your post.',             time:'3 hr ago',   unread:false },
+  { id:'n5', icon:'🏆', bg:'#fff8e1', text:'You\'re in the <b>Top 50 AI Creators</b> on Sianap 🇮🇳',          time:'Yesterday',  unread:false },
+  { id:'n6', icon:'🏛️', bg:'#e3f2fd', text:'<b>IndiaAI Mission</b> mentioned Sianap in their newsletter.',     time:'2 days ago', unread:false },
+];
+
+function _updateNotifBadge() {
+  const unread = _notifs.filter(n => n.unread).length;
+  // Sidebar badge
+  const sideBadge = document.querySelector('.sn-item[onclick*="notifs"] .sn-badge');
+  if (sideBadge) sideBadge.textContent = unread || '';
+  if (sideBadge) sideBadge.style.display = unread > 0 ? '' : 'none';
+  // Topbar badge
+  const topBadge = document.getElementById('topbar-notif-badge');
+  if (topBadge) { topBadge.textContent = unread || ''; topBadge.style.display = unread > 0 ? 'flex' : 'none'; }
+  // Bottom nav badge (nbadge dot)
+  const botBadge = document.querySelector('.ni[onclick*="notifs"] .nbadge');
+  if (botBadge) botBadge.style.display = unread > 0 ? 'block' : 'none';
+}
+
+function renderNotifs() {
+  const list = document.getElementById('notif-list');
+  if (!list) return;
+  if (_notifs.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:52px 24px;color:#aaa;">
+      <div style="font-size:44px;margin-bottom:12px;">🔔</div>
+      <div style="font-size:15px;font-weight:600;color:#555;margin-bottom:6px;">All caught up!</div>
+      <div style="font-size:13px;">No notifications right now.</div>
+    </div>`;
+  } else {
+    list.innerHTML = _notifs.map(n => `
+      <div class="notif${n.unread?' unread':''}" id="${n.id}" style="display:flex;align-items:center;position:relative;">
+        <div class="navo" style="background:${n.bg};">${n.icon}</div>
+        <div class="nb" style="flex:1;">
+          <div class="nt">${n.text}</div>
+          <div class="ntm">${n.time}</div>
+        </div>
+        ${n.unread ? '<div class="ndot"></div>' : ''}
+        <button onclick="deleteNotif('${n.id}')" style="flex-shrink:0;margin-left:8px;margin-right:4px;background:none;border:none;cursor:pointer;font-size:16px;color:#ccc;line-height:1;padding:4px;" title="Dismiss">✕</button>
+      </div>`).join('');
+  }
+  _updateNotifBadge();
+}
+
+function deleteNotif(id) {
+  const el = document.getElementById(id);
+  if (el) { el.style.opacity='0'; el.style.transform='translateX(30px)'; el.style.transition='all .22s'; setTimeout(() => el.remove(), 220); }
+  _notifs = _notifs.filter(n => n.id !== id);
+  setTimeout(() => { _updateNotifBadge(); if (_notifs.length === 0) renderNotifs(); }, 230);
+}
+
+function clearAllNotifs() {
+  const list = document.getElementById('notif-list');
+  if (!list) return;
+  [...list.children].forEach((el, i) => {
+    setTimeout(() => { el.style.opacity='0'; el.style.transform='translateX(30px)'; el.style.transition='all .18s'; }, i * 50);
+  });
+  setTimeout(() => { _notifs = []; renderNotifs(); }, _notifs.length * 50 + 200);
+}
+
+
+// Tracks which card is currently playing so we can stop it when another starts
+let _currentLiveCard = null;
+
+function playLiveVideo(cardId, videoId) {
+  const thumb  = document.getElementById('lv-thumb-'  + cardId);
+  const player = document.getElementById('lv-player-' + cardId);
+  const iframe = document.getElementById('lv-iframe-' + cardId);
+  if (!thumb || !player || !iframe) return;
+
+  // Pause & hide whatever was playing before
+  if (_currentLiveCard && _currentLiveCard !== cardId) {
+    const prevThumb  = document.getElementById('lv-thumb-'  + _currentLiveCard);
+    const prevPlayer = document.getElementById('lv-player-' + _currentLiveCard);
+    const prevIframe = document.getElementById('lv-iframe-' + _currentLiveCard);
+    if (prevPlayer) prevPlayer.style.display = 'none';
+    if (prevThumb)  prevThumb.style.display  = 'flex';
+    if (prevIframe) prevIframe.src = '';          // stop playback
+  }
+
+  // Toggle: if already playing this card, stop it
+  if (_currentLiveCard === cardId && player.style.display !== 'none') {
+    player.style.display = 'none';
+    thumb.style.display  = 'flex';
+    iframe.src = '';
+    _currentLiveCard = null;
+    return;
+  }
+
+  // Load embed URL with autoplay + rel=0 (no related-video redirects)
+  iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&origin=${location.href}`;
+  thumb.style.display  = 'none';
+  player.style.display = 'block';
+  _currentLiveCard = cardId;
+
+  // Smooth scroll so the player is visible
+  player.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+
+function renderSavedPosts() {
+  const list = document.getElementById('saved-posts-list');
+  if (!list) return;
+  const saved = Object.values(_savedPosts);
+  if (saved.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:48px 20px;color:#aaa;">
+      <div style="font-size:42px;margin-bottom:12px;">🔖</div>
+      <div style="font-size:15px;font-weight:600;color:#555;margin-bottom:6px;">No saved posts yet</div>
+      <div style="font-size:13px;">Tap the Save button on any post to bookmark it here.</div>
+    </div>`;
+  } else {
+    list.innerHTML = saved.map(p => buildPostCard(p)).join('');
+  }
+}
+
+const _origFeedFilter = typeof feedFilter === 'function' ? feedFilter : null;
+function feedFilter(type, el) {
+  // Highlight chip
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+
+  const liveEl  = document.getElementById('feed-live');
+  const savedEl = document.getElementById('feed-saved');
+  const feedListEl = document.getElementById('feed-list');
+
+  // Hide all panels first
+  if (liveEl)  liveEl.style.display  = 'none';
+  if (savedEl) savedEl.style.display = 'none';
+  if (feedListEl) feedListEl.style.display = 'block';
+
+  if (type === 'live') {
+    if (liveEl) liveEl.style.display = 'block';
+    if (feedListEl) feedListEl.style.display = 'none';
+  } else if (type === 'saved') {
+    if (savedEl) savedEl.style.display = 'block';
+    if (feedListEl) feedListEl.style.display = 'none';
+    renderSavedPosts();
+  } else {
+    renderFeed(type);
+  }
+}
 
 </script>
 </body>
