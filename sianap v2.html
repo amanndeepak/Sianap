@@ -1,0 +1,2787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sianap — India's AI Community</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: #f0f0f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Phone */
+.phone {
+  width: 375px;
+  height: 812px;
+  background: #f8f8fc;
+  border-radius: 52px;
+  border: 1px solid #ddd;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.18), 0 0 0 8px #e8e8ee;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Notch */
+.notch {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: #111;
+  border-radius: 0 0 20px 20px;
+  z-index: 100;
+}
+
+/* Status */
+.statusbar {
+  height: 48px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 24px 8px;
+  flex-shrink: 0;
+}
+.time { font-size: 15px; font-weight: 600; color: #111; }
+.icons { font-size: 13px; color: #111; }
+
+/* Screen */
+.screen {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: none;
+  padding-bottom: 80px;
+}
+.screen::-webkit-scrollbar { display: none; }
+
+/* Tabs */
+.tab { display: none; animation: up .25s ease; }
+.tab.active { display: block; }
+/* Indic script rendering */
+#tab-feed .post-text,
+#tab-feed .post-name,
+#tab-feed .post-time,
+#tab-feed .pc-name,
+#tab-feed .pc-body,
+#tab-feed .pc-meta,
+#tab-feed .vid-title,
+#tab-feed .pact { font-family: inherit; }
+
+#tab-feed .post-text { font-size: 14px; line-height: 1.65; }
+
+/* Slightly larger for dense Indic scripts */
+#tab-feed[lang-script="indic"] .post-text { font-size: 15px; line-height: 1.8; letter-spacing: 0.01em; }
+
+@keyframes up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+
+/* ── Shared ── */
+.page-title {
+  font-size: 26px; font-weight: 700; color: #111;
+  padding: 20px 20px 4px;
+}
+.page-sub {
+  font-size: 13px; color: #999;
+  padding: 0 20px 16px;
+}
+
+.section-label {
+  font-size: 12px; font-weight: 600; color: #aaa;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  padding: 16px 20px 8px;
+}
+
+/* Chips */
+.chips {
+  display: flex; gap: 8px;
+  padding: 0 20px 16px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  padding: 7px 16px; border-radius: 20px;
+  background: #ebebf0; color: #555;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  border: none; transition: all .2s;
+}
+.chip.on { background: #111; color: #fff; }
+
+/* Card */
+.card {
+  margin: 0 16px 12px;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+/* Feed post */
+.post-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 14px 10px;
+}
+.post-av {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.post-name { font-size: 14px; font-weight: 600; color: #111; }
+.post-time { font-size: 12px; color: #aaa; margin-top: 1px; }
+.post-badge {
+  margin-left: auto;
+  font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 20px;
+}
+.badge-ai { background: #fff3e0; color: #e65100; }
+.badge-proof { background: #e8f5e9; color: #2e7d32; }
+
+.post-text {
+  font-size: 14px; color: #333; line-height: 1.6;
+  padding: 0 14px 12px;
+}
+
+.post-img {
+  width: 100%; height: 150px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px;
+}
+
+/* ══════════════════════════════════════
+   DARK MODE — full coverage
+   ══════════════════════════════════════ */
+.phone.dark { background:#0d0d14 !important; color:#e8e8f4 !important; }
+.phone.dark .screen { background:#0d0d14 !important; }
+.phone.dark .statusbar { background:#0d0d14; }
+.phone.dark .time,
+.phone.dark .icons { color:#e8e8f4 !important; }
+
+/* Cards & containers */
+.phone.dark .card,
+.phone.dark .prompt-card,
+.phone.dark .mcard,
+.phone.dark .ncard,
+.phone.dark .compose,
+.phone.dark .ai-box,
+.phone.dark .chart-card,
+.phone.dark .scard,
+.phone.dark .phase,
+.phone.dark .sched,
+.phone.dark .vid-cell,
+.phone.dark .notif,
+.phone.dark .settings-card,
+.phone.dark .translate-bar { background:#1c1c2a !important; border-color:#2e2e42 !important; box-shadow:0 2px 12px rgba(0,0,0,0.4) !important; }
+
+/* Inner code / subdued blocks */
+.phone.dark .snippet,
+.phone.dark .pc-body,
+.phone.dark .sug,
+.phone.dark .compose textarea,
+.phone.dark .comment-panel,
+.phone.dark .comment-input-row { background:#13131e !important; }
+.phone.dark .comment-input { background:#22223a !important; color:#e8e8f4 !important; border:1px solid #2e2e42 !important; }
+.phone.dark .comment-item { border-bottom-color:#2e2e42 !important; }
+.phone.dark .comment-name { color:#e8e8f4 !important; }
+.phone.dark .comment-text { color:#a0a0c4 !important; }
+.phone.dark .comment-time { color:#55556a !important; }
+
+/* PRIMARY text — bright & readable */
+.phone.dark .post-name,
+.phone.dark .pc-name,
+.phone.dark .mtitle,
+.phone.dark .ph-title,
+.phone.dark .sched-name,
+.phone.dark .page-title,
+.phone.dark .vid-title,
+.phone.dark .prof-name,
+.phone.dark .section-label,
+.phone.dark .comment-name,
+.phone.dark h1, .phone.dark h2, .phone.dark h3 { color:#e8e8f4 !important; }
+
+/* SECONDARY text — clearly visible but softer */
+.phone.dark .post-text { color:#c4c4dc !important; }
+.phone.dark .post-time,
+.phone.dark .pc-meta,
+.phone.dark .ph-desc,
+.phone.dark .slbl,
+.phone.dark .sched-pl,
+.phone.dark .page-sub,
+.phone.dark .pc-stat,
+.phone.dark .nt,
+.phone.dark .ntm { color:#8888a8 !important; }
+
+/* App header */
+.phone.dark .app-head { background:#0d0d14 !important; }
+.phone.dark .app-head [style*="color:var(--text)"] { color:#e8e8f4 !important; }
+.phone.dark .app-head [style*="color:var(--sub)"] { color:#8888a8 !important; }
+
+/* Chips */
+.phone.dark .chip { background:#22223a !important; color:#a0a0c4 !important; border:1px solid #2e2e42 !important; }
+.phone.dark .chip.on { background:#6366f1 !important; color:#fff !important; border-color:#6366f1 !important; }
+
+/* Bottom nav */
+.phone.dark .bottom-nav { background:#0d0d14 !important; border-top:1px solid #2e2e42 !important; }
+.phone.dark .ni-lbl { color:#55556a !important; }
+.phone.dark .ni-icon { color:#55556a !important; filter:none !important; }
+.phone.dark .ni.active .ni-lbl { color:#6366f1 !important; }
+.phone.dark .ni.active .ni-icon { color:#6366f1 !important; }
+
+/* Dark mode toggle button */
+.phone.dark #dark-btn { background:#22223a !important; border-color:#2e2e42 !important; color:#e8e8f4 !important; }
+
+/* Language select */
+.phone.dark #langSelect { background:#22223a !important; color:#e8e8f4 !important; border-color:#2e2e42 !important; }
+
+/* Post actions */
+.phone.dark .post-actions { border-top-color:#2e2e42 !important; }
+.phone.dark .pact { color:#55556a !important; border-right-color:#2e2e42 !important; }
+.phone.dark .pact.liked { color:#f43f5e !important; }
+.phone.dark .pact.saved { color:#6366f1 !important; }
+.phone.dark .pact:hover { color:#a0a0c4 !important; }
+
+/* Buttons */
+.phone.dark .btn-copy { background:#22223a !important; color:#a0a0c4 !important; }
+.phone.dark .join-btn { background:#22223a !important; color:#e8e8f4 !important; }
+.phone.dark #dark-profile-btn { background:#22223a !important; color:#e8e8f4 !important; border-color:#2e2e42 !important; }
+
+/* Profile page — override ALL inline colors */
+.phone.dark #tab-profile { background:#0d0d14 !important; color:#e8e8f4 !important; }
+.phone.dark #tab-profile [style*="color:#111"] { color:#e8e8f4 !important; }
+.phone.dark #tab-profile [style*="color:#aaa"],
+.phone.dark #tab-profile [style*="color:#999"],
+.phone.dark #tab-profile [style*="color:#bbb"],
+.phone.dark #tab-profile [style*="color:#ccc"],
+.phone.dark #tab-profile [style*="color:#555"] { color:#8888a8 !important; }
+.phone.dark #tab-profile [style*="background:#fff"] { background:#1c1c2a !important; }
+.phone.dark #tab-profile [style*="background:#f8f8fc"],
+.phone.dark #tab-profile [style*="background:#f8f8f0"],
+.phone.dark #tab-profile [style*="background:#f0f0f5"],
+.phone.dark #tab-profile [style*="background:#f0f0ff"],
+.phone.dark #tab-profile [style*="background:#fff8f0"],
+.phone.dark #tab-profile [style*="background:#f4f4f8"] { background:#22223a !important; }
+.phone.dark #tab-profile [style*="border-bottom:1px solid #f0f0f5"],
+.phone.dark #tab-profile [style*="border-bottom: 1px solid"] { border-color:#2e2e42 !important; }
+.phone.dark #tab-profile .settings-card { background:#1c1c2a !important; }
+.phone.dark #tab-profile .settings-card > div { border-color:#2e2e42 !important; }
+
+/* Feed inline overrides */
+.phone.dark #tab-feed [style*="color:#111"] { color:#e8e8f4 !important; }
+.phone.dark #tab-feed [style*="color:#aaa"],
+.phone.dark #tab-feed [style*="color:#888"],
+.phone.dark #tab-feed [style*="color:#555"] { color:#8888a8 !important; }
+.phone.dark #tab-feed [style*="background:#f8f8fc"],
+.phone.dark #tab-feed [style*="background:#eee"],
+.phone.dark #tab-feed [style*="background:#f0f0f5"] { background:#22223a !important; }
+
+/* All tabs inline color overrides */
+.phone.dark [style*="color:#111"] { color:#e8e8f4 !important; }
+.phone.dark [style*="color:#333"] { color:#c4c4dc !important; }
+.phone.dark [style*="color:#555"] { color:#8888a8 !important; }
+.phone.dark [style*="color:#aaa"] { color:#8888a8 !important; }
+.phone.dark [style*="color:#999"] { color:#8888a8 !important; }
+.phone.dark [style*="color:#bbb"] { color:#55556a !important; }
+.phone.dark [style*="color:#ccc"] { color:#55556a !important; }
+.phone.dark [style*="background:#fff;"] { background:#1c1c2a !important; }
+.phone.dark [style*="background: #fff"] { background:#1c1c2a !important; }
+.phone.dark [style*="background:#f8f8fc"] { background:#22223a !important; }
+.phone.dark [style*="background:#f0f0f5"] { background:#22223a !important; }
+.phone.dark [style*="background:#eee"] { background:#22223a !important; }
+.phone.dark [style*="border-bottom:1px solid #f0f0f5"] { border-color:#2e2e42 !important; }
+.phone.dark [style*="border-top:1px solid #f0f0f5"] { border-color:#2e2e42 !important; }
+
+/* Feed inline color overrides — handled in global dark block above */
+
+/* Post actions */
+.post-actions {
+  display: flex;
+  border-top: 1px solid #f0f0f5;
+}
+.pact {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 11px 0; font-size: 12px; color: #bbb; cursor: pointer;
+  border-right: 1px solid #f0f0f5; transition: color .15s, transform .1s;
+  font-weight: 500; user-select: none;
+}
+.pact:last-child { border-right: none; }
+.pact:active { transform: scale(0.93); }
+.pact.liked { color: #f43f5e !important; font-weight: 700; }
+.pact.saved { color: #6366f1 !important; }
+
+/* Comment panel */
+.comment-panel {
+  border-top: 1px solid #f0f0f5;
+  background: #fafafa;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease;
+}
+.comment-panel.open { max-height: 300px; }
+.comment-item {
+  display: flex; gap: 9px; padding: 10px 14px;
+  border-bottom: 1px solid #f5f5f8;
+  align-items: flex-start;
+}
+.comment-av {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #e8e8f5;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #6366f1; flex-shrink: 0;
+}
+.comment-name { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 2px; }
+.comment-text { font-size: 12px; color: #666; line-height: 1.45; }
+.comment-time { font-size: 10px; color: #bbb; margin-left: auto; flex-shrink: 0; }
+.comment-input-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-top: 1px solid #f0f0f5; background: #fff;
+}
+.comment-input {
+  flex: 1; background: #f4f4f8; border: none; border-radius: 20px;
+  padding: 7px 12px; font-size: 12px; outline: none;
+  font-family: 'Inter', sans-serif; color: #111;
+}
+
+/* Code snippet */
+.snippet {
+  margin: 0 14px 12px;
+  background: #f8f8fc;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #6366f1;
+  line-height: 1.7;
+}
+.s-comment { color: #aaa; }
+.s-kw { color: #FF9933; }
+.s-str { color: #22c55e; }
+
+/* Prompt card */
+.prompt-card {
+  margin: 0 16px 12px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-left: 3px solid #6366f1;
+}
+.pc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.pc-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: #f0f0ff;
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.pc-name { font-size: 14px; font-weight: 600; color: #111; }
+.pc-meta { font-size: 12px; color: #aaa; }
+.pc-lang {
+  margin-left: auto;
+  background: #fff3e0; color: #e65100;
+  font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+}
+.pc-body {
+  background: #f8f8fc;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px; color: #555; line-height: 1.5;
+  margin-bottom: 12px;
+}
+.pc-footer { display: flex; align-items: center; gap: 8px; }
+.btn-run {
+  background: #6366f1; color: #fff;
+  border: none; padding: 8px 18px; border-radius: 20px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.btn-copy {
+  background: #f0f0f5; color: #555;
+  border: none; padding: 8px 14px; border-radius: 20px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.pc-stat { margin-left: auto; font-size: 12px; color: #aaa; }
+
+/* Video cell */
+.vid-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 16px; }
+.vid-cell {
+  background: #fff; border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+.vid-thumb {
+  height: 90px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px; position: relative;
+}
+.vid-play {
+  position: absolute; width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: #fff;
+}
+.vid-info { padding: 8px 10px 10px; }
+.vid-lang {
+  display: inline-block;
+  background: #fff3e0; color: #e65100;
+  font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 20px; margin-bottom: 4px;
+}
+.vid-title { font-size: 12px; font-weight: 600; color: #111; line-height: 1.3; margin-bottom: 2px; }
+.vid-meta { font-size: 11px; color: #aaa; }
+
+/* Translate bar */
+.translate-bar {
+  margin: 0 14px 10px;
+  background: #f0f0ff;
+  border: 1px solid #ddd5ff;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+.tbar-top {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.tbar-text {
+  margin-top: 8px;
+  font-size: 13px; color: #333; line-height: 1.6;
+  padding-top: 8px;
+  border-top: 1px solid #ddd5ff;
+}
+
+/* post-av ensure inside card-header */
+.post-header { display:flex; align-items:center; gap:10px; padding:13px 13px 10px; }
+
+/* ── Dark Mode Variables ── */
+.phone { --bg:#f8f8fc; --card:#fff; --card2:#f8f8fc; --text:#111; --sub:#999; --border:#eee; --chip-bg:#ebebf0; --chip-col:#555; }
+.phone.dark { --bg:#0e0e14; --card:#1a1a24; --card2:#22222e; --text:#f0f0f5; --sub:#777; --border:#2a2a38; --chip-bg:#22222e; --chip-col:#aaa; }
+.phone { background: var(--bg); transition: background .3s, color .3s; }
+.card,.compose,.ai-box,.prompt-card,.mcard,.ncard,.scard,.chart-card,.cal-grid,.phase,.sched,.vid-cell,.notif.unread,.notif { background: var(--card); transition: background .3s; }
+.snippet,.pc-body,.sug,.compose textarea { background: var(--card2); transition: background .3s; }
+.page-title,.post-name,.pc-name,.ph-title,.sched-name,.mtitle,.vid-title { color: var(--text); }
+.post-time,.post-text,.pc-meta,.ph-desc,.slbl,.vid-meta,.sched-pl,.nt,.ntitle { color: var(--sub); }
+.chip { background: var(--chip-bg); color: var(--chip-col); }
+.chip.on { background: #111; color: #fff; }
+.phone.dark .chip.on { background: #fff; color: #111; }
+.compose textarea { color: var(--text); }
+.sug { color: var(--text); }
+.section-label { color: var(--sub); }
+.statusbar .time,.statusbar .icons { color: var(--text); }
+.bottom-nav { background: rgba(255,255,255,0.95); }
+.phone.dark .bottom-nav { background: rgba(14,14,20,0.97); border-top-color: var(--border); }
+.phone.dark .ni-lbl { color: #444; }
+.phone.dark .ni.active .ni-lbl { color: #FF9933; }
+.phone.dark .post-actions { border-top-color: var(--border); }
+.phone.dark .pact { color: #444; border-right-color: var(--border); }
+.phone.dark .pact.liked { color: #f43f5e; }
+.phone.dark .cal-nav button { background: var(--card2); color: var(--text); }
+.phone.dark .join-btn { background: #f0f0ff; color: #6366f1; }
+.phone.dark .ncard { border-bottom: 1px solid var(--border); }
+.phone.dark .app-head select { background: var(--card); color: var(--text); border-color: var(--border); }
+
+.compose {
+  margin: 0 16px 12px;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.compose textarea {
+  width: 100%;
+  border: none; border-radius: 12px;
+  padding: 12px; outline: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; line-height: 1.6;
+  resize: none; min-height: 90px;
+}
+.compose textarea::placeholder { color: #bbb; }
+.ctoolbar {
+  display: flex; align-items: center; gap: 12px;
+  padding-top: 12px;
+}
+.ctool { font-size: 20px; cursor: pointer; color: #bbb; }
+.publish-btn {
+  margin-left: auto;
+  background: #FF9933; color: #fff;
+  border: none; padding: 9px 22px; border-radius: 20px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+
+/* AI suggestion */
+.ai-box {
+  margin: 0 16px 12px;
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.ai-label {
+  font-size: 11px; font-weight: 700; color: #6366f1;
+  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;
+}
+.sug {
+  background: #f8f8fc; border-radius: 12px;
+  padding: 10px 12px; font-size: 13px; color: #444; line-height: 1.5;
+  margin-bottom: 8px; cursor: pointer;
+  transition: background .2s;
+}
+.sug:last-child { margin-bottom: 0; }
+.sug:active { background: #eeeeff; }
+
+/* Meetup card */
+.mcard {
+  margin: 0 16px 12px;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.mcov {
+  height: 90px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; position: relative;
+}
+.mbadge {
+  position: absolute; top: 10px; right: 10px;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+}
+.mbody { padding: 12px 14px; }
+.mtitle { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 5px; }
+.mmeta { display: flex; gap: 12px; font-size: 12px; color: #aaa; margin-bottom: 10px; }
+.mfoot { display: flex; align-items: center; justify-content: space-between; }
+.atts { display: flex; align-items: center; gap: 4px; }
+.att-emojis { display: flex; }
+.att-e {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; margin-left: -5px;
+}
+.att-e:first-child { margin-left: 0; }
+.att-count { font-size: 11px; color: #aaa; }
+.join-btn {
+  background: #111; color: #fff;
+  border: none; padding: 8px 20px; border-radius: 20px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+
+/* News */
+.ncard {
+  display: flex; gap: 12px;
+  margin: 0 16px 10px; padding: 14px;
+  background: #fff; border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05); cursor: pointer;
+}
+.nthumb {
+  width: 64px; height: 64px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 26px;
+}
+.nbody { flex: 1; min-width: 0; }
+.nsrc { font-size: 10px; font-weight: 700; color: #FF9933; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.ntitle { font-size: 13px; font-weight: 600; color: #111; line-height: 1.4; margin-bottom: 5px; }
+.nmeta { font-size: 11px; color: #aaa; }
+.ai-pill {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: #f0f0ff; color: #6366f1;
+  font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 20px;
+}
+
+/* Calendar */
+.cal-head { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 14px; }
+.cal-month { font-size: 18px; font-weight: 700; color: #111; }
+.cal-nav { display: flex; gap: 6px; }
+.cal-nav button {
+  width: 30px; height: 30px; border-radius: 10px;
+  background: #f0f0f5; border: none; color: #111; cursor: pointer; font-size: 15px;
+}
+.cal-grid { padding: 0 16px 14px; background: #fff; margin: 0 16px 12px; border-radius: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
+.day-row { display: grid; grid-template-columns: repeat(7,1fr); text-align: center; padding: 12px 0 6px; }
+.dl { font-size: 11px; font-weight: 600; color: #bbb; }
+.cells { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; padding-bottom: 12px; }
+.cell {
+  aspect-ratio: 1; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #888; cursor: pointer; transition: all .2s; position: relative;
+}
+.cell:hover { background: #f0f0f5; }
+.cell.today { background: #FF9933; color: #fff; font-weight: 700; }
+.cell.has-event::after {
+  content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+  width: 3px; height: 3px; border-radius: 50%; background: #6366f1;
+}
+.cell.om { color: #ddd; }
+
+.sched {
+  margin: 0 16px 8px; padding: 12px 14px;
+  background: #fff; border-radius: 14px;
+  display: flex; gap: 12px; align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.sched-t { font-size: 12px; color: #aaa; font-weight: 600; min-width: 44px; }
+.sched-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.sched-body { flex: 1; }
+.sched-name { font-size: 13px; font-weight: 600; color: #111; }
+.sched-pl { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+/* Roadmap */
+.phase {
+  display: flex; gap: 14px;
+  margin: 0 16px 12px; padding: 14px;
+  background: #fff; border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  align-items: flex-start;
+}
+.ph-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.ph-title { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 3px; }
+.ph-desc { font-size: 12px; color: #888; line-height: 1.5; }
+.ph-tag {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  padding: 2px 10px; border-radius: 20px; margin-top: 6px;
+}
+
+/* Stats */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 4px; }
+.scard {
+  background: #fff; border-radius: 16px;
+  padding: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.sico { font-size: 22px; margin-bottom: 8px; }
+.sval { font-size: 22px; font-weight: 700; color: #111; }
+.slbl { font-size: 11px; color: #aaa; margin-top: 2px; }
+.schg { font-size: 12px; font-weight: 600; margin-top: 4px; }
+.up { color: #22c55e; }
+.dn { color: #f43f5e; }
+
+.chart-card {
+  margin: 0 16px 12px;
+  background: #fff; border-radius: 16px;
+  padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.chart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.chart-ttl { font-size: 14px; font-weight: 600; color: #111; }
+.chart-prd { font-size: 12px; color: #6366f1; font-weight: 600; }
+.bars { display: flex; align-items: flex-end; gap: 6px; height: 72px; }
+.bw { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.b { width: 100%; border-radius: 5px 5px 0 0; min-height: 3px; }
+.bl { font-size: 9px; color: #bbb; }
+
+/* Notifs */
+.notif {
+  display: flex; gap: 12px; align-items: flex-start;
+  margin: 0 16px 2px; padding: 14px;
+  border-radius: 16px; cursor: pointer; transition: background .2s;
+}
+.notif.unread { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.navo {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.nb { flex: 1; }
+.nt { font-size: 13px; color: #333; line-height: 1.45; margin-bottom: 3px; }
+.nt b { color: #111; }
+.ntm { font-size: 11px; color: #bbb; }
+.ndot { width: 8px; height: 8px; border-radius: 50%; background: #FF9933; flex-shrink: 0; margin-top: 5px; }
+
+/* Bottom Nav */
+.bottom-nav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 78px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid #eee;
+  display: flex; padding: 6px 0 16px;
+  z-index: 200;
+}
+.ni {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  cursor: pointer; padding: 4px 0;
+}
+.ni-icon { font-size: 22px; line-height: 1; position: relative; }
+.ni-lbl { font-size: 10px; color: #bbb; font-weight: 500; }
+.ni.active .ni-lbl { color: #FF9933; font-weight: 700; }
+.nbadge { position: absolute; top: -2px; right: -4px; width: 7px; height: 7px; border-radius: 50%; background: #f43f5e; border: 1.5px solid #fff; }
+
+.home-pill { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 100px; height: 4px; border-radius: 2px; background: #ddd; z-index: 300; }
+
+/* gradient helpers */
+.ga { background: linear-gradient(135deg,#f8e8ff,#e8e0ff); }
+.gb { background: linear-gradient(135deg,#e8f5e9,#d4edda); }
+.gc { background: linear-gradient(135deg,#fff3e0,#ffe0b2); }
+.gd { background: linear-gradient(135deg,#e3f2fd,#bbdefb); }
+.ge { background: linear-gradient(135deg,#fce4ec,#f8bbd0); }
+</style>
+</head>
+<body>
+<div class="phone" style="--bg:#f8f8fc;--card:#fff;--card2:#f8f8fc;--text:#111;--sub:#999;--border:#eee;--chip-bg:#ebebf0;--chip-col:#555;">
+
+  <div class="notch"></div>
+
+  <div class="statusbar">
+    <div class="time">9:41</div>
+    <div class="icons">▲▲ 🔋</div>
+  </div>
+
+  <div class="screen">
+
+    <!-- FEED -->
+    <div class="tab active" id="tab-feed">
+      <div class="app-head" style="padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:22px;font-weight:800;color:var(--text);">Sianap 🇮🇳</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:1px;">Where India Trains, Tests & Talks AI</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+          <!-- Dark mode toggle -->
+          <div onclick="toggleDark()" id="dark-btn" style="width:32px;height:32px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;border:1px solid var(--border);">🌙</div>
+          <!-- Language selector -->
+          <div style="position:relative;">
+            <select id="langSelect" onchange="setLang(this.value)" style="appearance:none;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:5px 24px 5px 8px;font-size:11px;font-weight:600;color:var(--text);outline:none;cursor:pointer;max-width:90px;">
+              <option value="en">🌐 EN</option>
+              <option value="hi">🇮🇳 हिंदी</option>
+              <option value="pa">ਪੰਜਾਬੀ</option>
+              <option value="ta">தமிழ்</option>
+              <option value="kn">ಕನ್ನಡ</option>
+              <option value="te">తెలుగు</option>
+              <option value="mr">मराठी</option>
+            </select>
+            <span style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:9px;color:var(--sub);pointer-events:none;">▾</span>
+          </div>
+          <!-- Profile avatar -->
+          <div onclick="go('profile',document.querySelector('.ni:last-child'))" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#FF9933);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;">AS</div>
+        </div>
+      </div>
+
+      <!-- Language banner (hidden by default) -->
+      <div id="lang-banner" style="display:none;margin:0 16px 10px;background:#f0f0ff;border:1px solid #ddd5ff;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:16px;">🌐</span>
+        <div style="flex:1;font-size:12px;color:#444;line-height:1.4;">Feed language set to <b id="lang-name">English</b>. AI will offer translations on posts.</div>
+        <span onclick="document.getElementById('lang-banner').style.display='none'" style="font-size:16px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+
+      <div class="chips" style="padding-top:4px;">
+        <div class="chip on" onclick="feedFilter('all', this)">All</div>
+        <div class="chip" onclick="feedFilter('prompts', this)">⚡ Prompts</div>
+        <div class="chip" onclick="feedFilter('videos', this)">🎬 Videos</div>
+        <div class="chip" onclick="feedFilter('images', this)">📸 Images</div>
+        <div class="chip" onclick="feedFilter('audio', this)">🎙️ Audio</div>
+        <div class="chip" onclick="feedFilter('indic', this)">🇮🇳 Indic Models</div>
+        <div class="chip" onclick="feedFilter('discuss', this)">💬 Discuss</div>
+      </div>
+
+      <div id="feed-list"></div>
+    </div>
+
+    <!-- LIBRARY -->
+    <div class="tab" id="tab-images">
+      <div class="page-title">Library</div>
+      <div class="page-sub">Prompts · Videos · Notebooks</div>
+
+      <div class="chips">
+        <div class="chip on" onclick="libraryFilter('prompts', this)">⚡ Prompts</div>
+        <div class="chip" onclick="libraryFilter('videos', this)">🎬 Videos</div>
+        <div class="chip" onclick="libraryFilter('notebooks', this)">📓 Notebooks</div>
+      </div>
+
+      <div id="library-content"></div>
+    </div>
+
+    <!-- CREATE -->
+    <div class="tab" id="tab-post">
+      <div class="page-title">Create</div>
+      <div class="page-sub">Post, prompt, video, or poll</div>
+
+      <div class="chips">
+        <div class="chip on" onclick="createFilter('text', this)">✍️ Text</div>
+        <div class="chip" onclick="createFilter('prompt', this)">⚡ Prompt</div>
+        <div class="chip" onclick="createFilter('video', this)">🎬 Video</div>
+        <div class="chip" onclick="createFilter('poll', this)">📊 Poll</div>
+      </div>
+
+      <div id="create-content"></div>
+    </div>
+
+    <!-- MEETUP -->
+    <div class="tab" id="tab-meetup">
+      <div class="page-title">Meetups</div>
+      <div class="page-sub">AI events near you</div>
+
+      <div class="chips">
+        <div class="chip on" onclick="meetupFilter('all', this)">All</div>
+        <div class="chip" onclick="meetupFilter('online', this)">Online</div>
+        <div class="chip" onclick="meetupFilter('bangalore', this)">Bangalore</div>
+        <div class="chip" onclick="meetupFilter('mumbai', this)">Mumbai</div>
+        <div class="chip" onclick="meetupFilter('free', this)">Free</div>
+      </div>
+
+      <div id="meetup-list"></div>
+    </div>
+
+    <!-- NEWS -->
+    <div class="tab" id="tab-news">
+      <div class="page-title">News</div>
+      <div class="page-sub">AI-curated for India builders</div>
+
+      <div class="chips">
+        <div class="chip on" onclick="newsFilter('all', this)">All</div>
+        <div class="chip" onclick="newsFilter('indiaai', this)">IndiaAI</div>
+        <div class="chip" onclick="newsFilter('funding', this)">Funding</div>
+        <div class="chip" onclick="newsFilter('research', this)">Research</div>
+        <div class="chip" onclick="newsFilter('policy', this)">Policy</div>
+      </div>
+
+      <div id="news-list"></div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="tab" id="tab-calendar">
+      <div class="page-title">Schedule</div>
+      <div class="page-sub">Content & roadmap planning</div>
+
+      <div class="chips">
+        <div class="chip on" onclick="scheduleFilter('today', this)">📅 Today</div>
+        <div class="chip" onclick="scheduleFilter('upcoming', this)">📆 Upcoming</div>
+        <div class="chip" onclick="scheduleFilter('roadmap', this)">🗺️ Roadmap</div>
+      </div>
+
+      <div id="schedule-content"></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="tab" id="tab-analytics">
+      <div class="page-title">Stats</div>
+      <div class="page-sub">Your performance overview</div>
+
+      <div class="chips">
+        <div class="chip on" onclick="statsFilter('overview', this)">📊 Overview</div>
+        <div class="chip" onclick="statsFilter('posts', this)">📝 Posts</div>
+        <div class="chip" onclick="statsFilter('prompts', this)">⚡ Prompts</div>
+        <div class="chip" onclick="statsFilter('audience', this)">👥 Audience</div>
+      </div>
+
+      <div id="stats-content"></div>
+    </div>
+
+    <!-- NOTIFS -->
+    <div class="tab" id="tab-notifs">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 20px 4px;">
+        <div class="page-title" style="padding:0;">Notifications</div>
+        <div style="font-size:13px;color:#6366f1;font-weight:600;cursor:pointer;">Clear all</div>
+      </div>
+      <div class="page-sub">What's happening</div>
+
+      <div class="notif unread">
+        <div class="navo" style="background:#fff3e0;">🤖</div>
+        <div class="nb"><div class="nt"><b>Sianap AI</b> scheduled your Hindi prompt post for 7:30 PM IST.</div><div class="ntm">Just now</div></div>
+        <div class="ndot"></div>
+      </div>
+      <div class="notif unread">
+        <div class="navo" style="background:#e8f5e9;">✅</div>
+        <div class="nb"><div class="nt"><b>Priya Nair</b> gave your prompt a Proof-of-AI badge.</div><div class="ntm">10 min ago</div></div>
+        <div class="ndot"></div>
+      </div>
+      <div class="notif unread">
+        <div class="navo" style="background:#f0f0ff;">⚡</div>
+        <div class="nb"><div class="nt">Your <b>Kannada prompt</b> hit 1,000 runs! 🎉</div><div class="ntm">1 hr ago</div></div>
+        <div class="ndot"></div>
+      </div>
+      <div class="notif">
+        <div class="navo" style="background:#fce4ec;">❤️</div>
+        <div class="nb"><div class="nt"><b>DevSpark India</b> and 204 others liked your post.</div><div class="ntm">3 hr ago</div></div>
+      </div>
+      <div class="notif">
+        <div class="navo" style="background:#fff8e1;">🏆</div>
+        <div class="nb"><div class="nt">You're in the <b>Top 50 AI Creators</b> on Sianap 🇮🇳</div><div class="ntm">Yesterday</div></div>
+      </div>
+      <div class="notif">
+        <div class="navo" style="background:#e3f2fd;">🏛️</div>
+        <div class="nb"><div class="nt"><b>IndiaAI Mission</b> mentioned Sianap in their newsletter.</div><div class="ntm">2 days ago</div></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="tab" id="tab-profile">
+
+      <!-- Cover -->
+      <div style="height:90px;background:linear-gradient(135deg,#6366f1,#FF9933);flex-shrink:0;position:relative;">
+        <button onclick="toggleDark()" id="dark-profile-btn" style="position:absolute;top:12px;right:12px;padding:6px 12px;border-radius:20px;background:rgba(255,255,255,0.25);color:#fff;border:1px solid rgba(255,255,255,0.4);font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">🌙 Dark</button>
+      </div>
+
+      <!-- Avatar row -->
+      <div style="padding:0 20px;margin-top:-30px;margin-bottom:8px;display:flex;align-items:flex-end;justify-content:space-between;">
+        <div id="profile-avatar" onclick="openModal('editProfile')" style="width:62px;height:62px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#FF9933);border:3px solid #f8f8fc;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;cursor:pointer;">AS</div>
+        <button onclick="openModal('editProfile')" style="padding:8px 18px;border-radius:20px;background:#6366f1;color:#fff;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">✏️ Edit Profile</button>
+      </div>
+
+      <!-- Name & stats -->
+      <div style="padding:0 20px 14px;">
+        <div style="font-size:18px;font-weight:800;color:#111;" class="prof-name" id="display-name">Amandeep Singh</div>
+        <div style="font-size:12px;color:#999;margin-top:2px;" id="display-handle">@amandeepsingh · AI Builder · Bangalore 🇮🇳</div>
+        <div style="display:flex;gap:0;margin-top:12px;background:#f8f8fc;border-radius:14px;overflow:hidden;">
+          <div style="flex:1;text-align:center;padding:10px 4px;border-right:1px solid #eee;"><div style="font-size:15px;font-weight:800;color:#111;">10.4K</div><div style="font-size:9px;color:#aaa;margin-top:1px;">Followers</div></div>
+          <div style="flex:1;text-align:center;padding:10px 4px;border-right:1px solid #eee;"><div style="font-size:15px;font-weight:800;color:#111;">842</div><div style="font-size:9px;color:#aaa;margin-top:1px;">Following</div></div>
+          <div style="flex:1;text-align:center;padding:10px 4px;border-right:1px solid #eee;"><div style="font-size:15px;font-weight:800;color:#111;">98</div><div style="font-size:9px;color:#aaa;margin-top:1px;">AI Posts</div></div>
+          <div style="flex:1;text-align:center;padding:10px 4px;"><div style="font-size:15px;font-weight:800;color:#FF9933;">⭐4.9</div><div style="font-size:9px;color:#aaa;margin-top:1px;">Rating</div></div>
+        </div>
+      </div>
+
+      <!-- Scroll Wellness -->
+      <div style="margin:0 16px 12px;background:linear-gradient(135deg,#f0f0ff,#fff8f0);border-radius:18px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+        <div style="font-size:11px;font-weight:700;color:#6366f1;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">🧘 Scroll Wellness</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <div style="flex:1;background:#fff;border-radius:12px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#6366f1;">1h 42m</div><div style="font-size:10px;color:#aaa;margin-top:2px;">Today's screen time</div></div>
+          <div style="flex:1;background:#fff;border-radius:12px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#FF9933;">2.4×</div><div style="font-size:10px;color:#aaa;margin-top:2px;">vs daily avg</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:11px;color:#555;">📜 Scrolling</span><span style="font-size:11px;font-weight:700;color:#333;">58%</span></div><div style="height:5px;background:#f0f0f5;border-radius:3px;"><div style="height:100%;width:58%;background:#6366f1;border-radius:3px;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:11px;color:#555;">✍️ Creating</span><span style="font-size:11px;font-weight:700;color:#333;">22%</span></div><div style="height:5px;background:#f0f0f5;border-radius:3px;"><div style="height:100%;width:22%;background:#FF9933;border-radius:3px;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:11px;color:#555;">⚡ Prompts</span><span style="font-size:11px;font-weight:700;color:#333;">12%</span></div><div style="height:5px;background:#f0f0f5;border-radius:3px;"><div style="height:100%;width:12%;background:#22c55e;border-radius:3px;"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="font-size:11px;color:#555;">💬 Commenting</span><span style="font-size:11px;font-weight:700;color:#333;">8%</span></div><div style="height:5px;background:#f0f0f5;border-radius:3px;"><div style="height:100%;width:8%;background:#f43f5e;border-radius:3px;"></div></div></div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:13px;font-weight:600;color:#111;">⏱️ Daily Scroll Limit</span><span id="limit-val" style="font-size:13px;font-weight:800;color:#6366f1;">2h 00m</span></div>
+          <input type="range" min="30" max="300" value="120" step="30" id="scroll-limit" oninput="updateLimit(this.value)" style="width:100%;accent-color:#6366f1;cursor:pointer;">
+          <div style="display:flex;justify-content:space-between;margin-top:4px;"><span style="font-size:10px;color:#aaa;">30m</span><span style="font-size:10px;color:#aaa;">5h</span></div>
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;color:#555;">🔔 Break reminder every 30 min</span><div onclick="toggleSwitch(this)" class="sw-on" style="width:38px;height:21px;border-radius:11px;background:#FF9933;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;"><div style="width:17px;height:17px;border-radius:50%;background:#fff;position:absolute;top:2px;right:2px;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:all .2s;"></div></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;color:#555;">🌙 Night mode after 10 PM</span><div onclick="toggleSwitch(this)" class="sw-on" style="width:38px;height:21px;border-radius:11px;background:#FF9933;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;"><div style="width:17px;height:17px;border-radius:50%;background:#fff;position:absolute;top:2px;right:2px;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:all .2s;"></div></div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;color:#555;">📊 Weekly usage report</span><div onclick="toggleSwitch(this)" style="width:38px;height:21px;border-radius:11px;background:#eee;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;"><div style="width:17px;height:17px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:all .2s;"></div></div></div>
+        </div>
+      </div>
+
+      <!-- Account Settings -->
+      <div style="margin:0 16px 12px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);" class="settings-card">
+        <div style="padding:12px 16px;font-size:10px;font-weight:700;color:#aaa;letter-spacing:1.2px;text-transform:uppercase;border-bottom:1px solid #f0f0f5;">Account</div>
+        <div onclick="openModal('editProfile')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f0f5;cursor:pointer;"><span style="font-size:18px;">👤</span><span style="flex:1;font-size:14px;color:#111;font-weight:500;">Edit Profile</span><span style="font-size:14px;color:#ccc;">›</span></div>
+        <div onclick="openModal('notifications')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f0f5;cursor:pointer;"><span style="font-size:18px;">🔔</span><span style="flex:1;font-size:14px;color:#111;font-weight:500;">Notifications</span><span style="font-size:14px;color:#ccc;">›</span></div>
+        <div onclick="openModal('language')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f0f5;cursor:pointer;"><span style="font-size:18px;">🌐</span><span style="flex:1;font-size:14px;color:#111;font-weight:500;">Language & Region</span><span style="font-size:12px;color:#aaa;margin-right:4px;" id="lang-display">English</span><span style="font-size:14px;color:#ccc;">›</span></div>
+        <div onclick="openModal('appearance')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;"><span style="font-size:18px;">🎨</span><span style="flex:1;font-size:14px;color:#111;font-weight:500;">Appearance</span><span style="font-size:14px;color:#ccc;">›</span></div>
+      </div>
+
+      <!-- Privacy -->
+      <div style="margin:0 16px 12px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);" class="settings-card">
+        <div style="padding:12px 16px;font-size:10px;font-weight:700;color:#aaa;letter-spacing:1.2px;text-transform:uppercase;border-bottom:1px solid #f0f0f5;">Privacy & Safety</div>
+        <div onclick="openModal('privacy')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f0f5;cursor:pointer;"><span style="font-size:18px;">🔒</span><span style="flex:1;font-size:14px;color:#111;font-weight:500;">Privacy Settings</span><span style="font-size:14px;color:#ccc;">›</span></div>
+        <div onclick="openModal('whoCanSee')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f0f5;cursor:pointer;"><span style="font-size:18px;">👁️</span><span style="flex:1;font-size:14px;color:#111;font-weight:500;">Who can see my posts</span><span style="font-size:12px;color:#aaa;margin-right:4px;" id="visibility-display">Everyone</span><span style="font-size:14px;color:#ccc;">›</span></div>
+        <div onclick="openModal('blocked')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;"><span style="font-size:18px;">🚫</span><span style="flex:1;font-size:14px;color:#111;font-weight:500;">Blocked Accounts</span><span style="font-size:12px;color:#aaa;margin-right:4px;">3</span><span style="font-size:14px;color:#ccc;">›</span></div>
+      </div>
+
+      <!-- Support -->
+      <div style="margin:0 16px 12px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);" class="settings-card">
+        <div style="padding:12px 16px;font-size:10px;font-weight:700;color:#aaa;letter-spacing:1.2px;text-transform:uppercase;border-bottom:1px solid #f0f0f5;">Support</div>
+        <div onclick="openModal('helpCenter')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f0f5;cursor:pointer;"><span style="font-size:18px;">❓</span><span style="flex:1;font-size:14px;color:#111;font-weight:500;">Help Center</span><span style="font-size:14px;color:#ccc;">›</span></div>
+        <div onclick="openModal('feedback')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #f0f0f5;cursor:pointer;"><span style="font-size:18px;">📝</span><span style="flex:1;font-size:14px;color:#111;font-weight:500;">Send Feedback</span><span style="font-size:14px;color:#ccc;">›</span></div>
+        <div onclick="openModal('rateApp')" style="display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;"><span style="font-size:18px;">⭐</span><span style="flex:1;font-size:14px;color:#111;font-weight:500;">Rate Sianap</span><span style="font-size:14px;color:#ccc;">›</span></div>
+      </div>
+
+      <div style="padding:0 16px 12px;">
+        <button onclick="openModal('logout')" style="width:100%;padding:13px;border-radius:14px;background:#fce4ec;color:#c62828;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">🚪 Log Out</button>
+      </div>
+      <div style="text-align:center;padding-bottom:24px;font-size:11px;color:#bbb;">Sianap v1.0.0 · Made with ❤️ for India 🇮🇳</div>
+    </div>
+
+    <!-- ══ MODALS OVERLAY ══ -->
+    <div id="modal-overlay" onclick="if(event.target===this)closeModal()" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:flex-end;">
+      <div id="modal-sheet" style="background:#fff;border-radius:24px 24px 0 0;width:100%;max-height:88%;overflow-y:auto;padding-bottom:24px;transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);">
+        <div style="width:36px;height:4px;background:#e0e0e0;border-radius:2px;margin:10px auto 0;"></div>
+        <div id="modal-content"></div>
+      </div>
+    </div>
+
+  </div><!-- /screen -->
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="ni active" onclick="go('feed',this)"><div class="ni-icon">🏠</div><div class="ni-lbl">Feed</div></div>
+    <div class="ni" onclick="go('images',this)"><div class="ni-icon">📚</div><div class="ni-lbl">Library</div></div>
+    <div class="ni" onclick="go('post',this)"><div class="ni-icon">✏️</div><div class="ni-lbl">Create</div></div>
+    <div class="ni" onclick="go('meetup',this)"><div class="ni-icon">🗓️</div><div class="ni-lbl">Meetups</div></div>
+    <div class="ni" onclick="go('news',this)"><div class="ni-icon">📰</div><div class="ni-lbl">News</div></div>
+    <div class="ni" onclick="go('calendar',this)"><div class="ni-icon">📅</div><div class="ni-lbl">Schedule</div></div>
+    <div class="ni" onclick="go('analytics',this)"><div class="ni-icon">📊</div><div class="ni-lbl">Stats</div></div>
+    <div class="ni" onclick="go('notifs',this)">
+      <div class="ni-icon">🔔<div class="nbadge"></div></div>
+      <div class="ni-lbl">Alerts</div>
+    </div>
+    <div class="ni" onclick="go('profile',this)"><div class="ni-icon">👤</div><div class="ni-lbl">Profile</div></div>
+  </div>
+
+  <div class="home-pill"></div>
+</div>
+
+<script>
+function go(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  const tab = document.getElementById('tab-' + id);
+  if (tab) tab.classList.add('active');
+  if (el) el.classList.add('active');
+  document.querySelector('.screen').scrollTop = 0;
+}
+
+// ── Dark Mode ──
+let isDark = false;
+function toggleDark() {
+  isDark = !isDark;
+  document.querySelector('.phone').classList.toggle('dark', isDark);
+  const icon = isDark ? '☀️' : '🌙';
+  const label = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+  const btn = document.getElementById('dark-btn');
+  const pbtn = document.getElementById('dark-profile-btn');
+  if (btn) btn.textContent = icon;
+  if (pbtn) pbtn.textContent = label;
+}
+
+// ── Toggle switch helper ──
+function toggleSwitch(el) {
+  const isOn = el.classList.toggle('sw-on');
+  el.style.background = isOn ? '#FF9933' : '#eee';
+  const dot = el.querySelector('div');
+  if (dot) { dot.style.right = isOn ? '2px' : ''; dot.style.left = isOn ? '' : '2px'; }
+}
+
+function updateLimit(v) {
+  const h = Math.floor(v/60), m = v%60;
+  const el = document.getElementById('limit-val');
+  if (el) el.textContent = (h>0?h+'h ':'') + (m>0?m+'m':'');
+}
+
+// ── Poll: add option ──
+let pollOptCount = 4;
+const optLabels = ['A','B','C','D','E','F'];
+function addPollOption() {
+  if (pollOptCount >= 6) return;
+  const opts = document.getElementById('poll-opts');
+  if (!opts) return;
+  const lbl = optLabels[pollOptCount];
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:8px;align-items:center;';
+  div.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:#f0f0ff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#6366f1;flex-shrink:0;">${lbl}</div>
+    <input placeholder="Option ${lbl}" style="flex:1;background:#f8f8fc;border:none;border-radius:10px;padding:10px 12px;font-size:13px;color:#111;outline:none;font-family:'Inter',sans-serif;">`;
+  opts.appendChild(div);
+  pollOptCount++;
+  if (pollOptCount >= 6) document.getElementById('add-opt-btn').style.display='none';
+}
+
+
+function chip(el) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// ── Feed tab ──
+let currentLang = 'en';
+const langNames = { en:'English', hi:'हिंदी', ta:'தமிழ்', kn:'ಕನ್ನಡ', te:'తెలుగు', pa:'ਪੰਜਾਬੀ', mr:'मराठी' };
+
+// Google Fonts per script
+const langFonts = {
+  en: 'Inter',
+  hi: 'Hind',
+  mr: 'Hind',
+  pa: 'Mukta',
+  ta: 'Noto Sans Tamil',
+  kn: 'Noto Sans Kannada',
+  te: 'Noto Sans Telugu'
+};
+
+// Preload fonts
+const fontLink = document.createElement('link');
+fontLink.rel = 'stylesheet';
+fontLink.href = 'https://fonts.googleapis.com/css2?family=Hind:wght@400;600;700&family=Mukta:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Kannada:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap';
+document.head.appendChild(fontLink);
+
+// Full feed posts per language — each post is written natively in that script
+const feedByLang = {
+  en: [
+    { id:1, type:'indic', av:'P', avColor:'#6366f1', name:'Priya Nair', time:'5 min ago', badge:'✅ Verified AI', badgeClass:'badge-proof', postLang:'Tamil', text:'Fine-tuned IndicBERT on Tamil legal data — 91% F1 score on NER. Full config in comments 👇', img:'gb', imgEmoji:'🧠', likes:'1.4K', comments:'89', action:'▶️ Run', liked:true, tags:['all','indic'] },
+    { id:2, type:'prompts', av:'A', avColor:'#22c55e', name:'Arjun Sharma', time:'18 min ago', badge:'⚡ Prompt', badgeClass:'badge-ai', postLang:'Hindi', text:null, isPromptCard:true, promptTitle:'Hindi Summariser', promptMeta:'by Arjun · 234 runs · ⭐ 4.9', promptBody:'"Summarise the following in Hindi in 3 bullet points under 15 words each. Text: {{input}}"', promptSaves:'1.2K saves', tags:['all','prompts'] },
+    { id:3, type:'discuss', av:'D', avColor:'#FF9933', name:'DevSpark India', time:'1 hr ago', badge:'🔥 Trending', badgeClass:'badge-ai', postLang:'English', text:"IndiaAI Mission's GPU subsidies are live! 890+ GenAI startups are already applying. Here's how you can too 🇮🇳", img:'gc', imgEmoji:'🏛️', likes:'3.8K', comments:'204', action:'🔁 Share', tags:['all','discuss'] },
+    { id:4, type:'indic', av:'R', avColor:'#0891b2', name:'Ravi Kumar', time:'2 hr ago', badge:'🇮🇳 Indic', badgeClass:'badge-proof', postLang:'English', text:'Which Indic language model performs best for conversational AI? We tested 6 models across 5 languages. Thread 🧵', img:'gd', imgEmoji:'📊', likes:'2.1K', comments:'312', action:'🔁 Share', tags:['all','indic','discuss'] },
+    { id:5, type:'audio', av:'M', avColor:'#f43f5e', name:'MindfulAI Pod', time:'3 hr ago', badge:'🎙️ Audio', badgeClass:'badge-ai', postLang:'Hindi', text:'Just dropped a full Hindi podcast on building RAG pipelines with LangChain. No code jargon, pure concepts 🎙️', isAudio:true, audioTitle:'RAG Pipelines — Hindi Explainer', audioDuration:'24:30', likes:'890', comments:'67', action:'▶️ Play', tags:['all','audio'] },
+    { id:6, type:'discuss', av:'V', avColor:'#8b5cf6', name:'Sianap Community', time:'4 hr ago', badge:'💬 Discuss', badgeClass:'badge-proof', postLang:'English', text:"Hot take: You don't need a PhD to contribute to Indic AI. You need curiosity and your mother tongue. 🇮🇳", likes:'5.2K', comments:'408', action:'🔁 Share', tags:['all','discuss'] },
+    { id:7, type:'videos', av:'N', avColor:'#FF9933', name:'NLP with Neha', time:'5 hr ago', badge:'🎬 Video', badgeClass:'badge-ai', postLang:'Tamil', text:null, isVideoCard:true, videoEmoji:'🎬', videoBg:'ga', videoTitle:'Build a RAG in 20 Min — Tamil', videoViews:'18K views', videoDur:'22:14', likes:'1.1K', comments:'94', action:'▶️ Watch', tags:['all','videos'] },
+    { id:11, type:'images', av:'A', avColor:'#8b5cf6', name:'Ananya Krishnan', time:'2 hr ago', badge:'📸 Image', badgeClass:'badge-ai', postLang:'Hindi', text:'My AI model generated its first Indic poem — and it is stunning! 🤩 Check this out 👇', isImageCard:true, images:[{bg:'linear-gradient(135deg,#f8e8ff,#d8c0ff)',emoji:'🌸',caption:'AI-generated Hindi Poem'},{bg:'linear-gradient(135deg,#e8f5e9,#b2dfdb)',emoji:'🌿',caption:'Nature Theme Output'}], likes:'2.8K', comments:'143', action:'🔁 Share', tags:['all','images'] },
+    { id:12, type:'images', av:'D', avColor:'#FF9933', name:'DataViz India', time:'4 hr ago', badge:'📊 Infographic', badgeClass:'badge-proof', postLang:'English', text:"India's GenAI startup map 2026 — every major player, sector-wise. Save this! 🗺️🇮🇳", isImageCard:true, images:[{bg:'linear-gradient(135deg,#fff3e0,#ffe0b2)',emoji:'🗺️',caption:'GenAI Startup Map — India 2026'}], likes:'6.1K', comments:'389', action:'🔁 Share', tags:['all','images','discuss'] },
+  ],
+
+  hi: [
+    { id:101, type:'indic', av:'प', avColor:'#6366f1', name:'प्रिया नायर', time:'5 मिनट पहले', badge:'✅ सत्यापित AI', badgeClass:'badge-proof', postLang:'हिंदी', text:'Tamil कानूनी डेटा पर IndicBERT फाइन-ट्यून किया — NER पर 91% F1 स्कोर। पूरा config नीचे शेयर कर रहा हूँ 👇', img:'gb', imgEmoji:'🧠', likes:'1.4K', comments:'89', action:'▶️ रन करें', liked:true, tags:['all','indic'] },
+    { id:102, type:'prompts', av:'अ', avColor:'#22c55e', name:'अर्जुन शर्मा', time:'18 मिनट पहले', badge:'⚡ प्रॉम्प्ट', badgeClass:'badge-ai', postLang:'हिंदी', text:null, isPromptCard:true, promptTitle:'हिंदी सारांश प्रॉम्प्ट', promptMeta:'अर्जुन द्वारा · 234 रन · ⭐ 4.9', promptBody:'"निम्नलिखित पाठ का हिंदी में 3 बिंदुओं में सारांश दें, हर बिंदु 15 शब्दों से कम हो। पाठ: {{input}}"', promptSaves:'1.2K सेव', tags:['all','prompts'] },
+    { id:103, type:'discuss', av:'द', avColor:'#FF9933', name:'DevSpark इंडिया', time:'1 घंटे पहले', badge:'🔥 ट्रेंडिंग', badgeClass:'badge-ai', postLang:'हिंदी', text:'IndiaAI Mission की GPU सब्सिडी अब लाइव है! 890+ GenAI स्टार्टअप पहले से आवेदन कर रहे हैं। आप भी कर सकते हैं 🇮🇳', img:'gc', imgEmoji:'🏛️', likes:'3.8K', comments:'204', action:'🔁 शेयर', tags:['all','discuss'] },
+    { id:104, type:'indic', av:'र', avColor:'#0891b2', name:'रवि कुमार', time:'2 घंटे पहले', badge:'🇮🇳 Indic', badgeClass:'badge-proof', postLang:'हिंदी', text:'संवादी AI के लिए सबसे अच्छा Indic भाषा मॉडल कौन सा है? हमने 5 भाषाओं में 6 मॉडल टेस्ट किए। पूरा थ्रेड पढ़ें 🧵', img:'gd', imgEmoji:'📊', likes:'2.1K', comments:'312', action:'🔁 शेयर', tags:['all','indic','discuss'] },
+    { id:105, type:'audio', av:'म', avColor:'#f43f5e', name:'MindfulAI पॉड', time:'3 घंटे पहले', badge:'🎙️ ऑडियो', badgeClass:'badge-ai', postLang:'हिंदी', text:'LangChain के साथ RAG पाइपलाइन बनाने पर पूरा हिंदी पॉडकास्ट लाया हूँ। कोई code jargon नहीं, सिर्फ concepts 🎙️', isAudio:true, audioTitle:'RAG पाइपलाइन — हिंदी गाइड', audioDuration:'24:30', likes:'890', comments:'67', action:'▶️ सुनें', tags:['all','audio'] },
+    { id:106, type:'discuss', av:'वि', avColor:'#8b5cf6', name:'Sianap समुदाय', time:'4 घंटे पहले', badge:'💬 चर्चा', badgeClass:'badge-proof', postLang:'हिंदी', text:'Indic AI में योगदान के लिए PhD की जरूरत नहीं। सिर्फ जिज्ञासा और अपनी मातृभाषा चाहिए। क्या आप सहमत हैं? 🇮🇳', likes:'5.2K', comments:'408', action:'🔁 शेयर', tags:['all','discuss'] },
+    { id:107, type:'images', av:'अ', avColor:'#8b5cf6', name:'अनन्या कृष्णन', time:'2 घंटे पहले', badge:'📸 फोटो', badgeClass:'badge-ai', postLang:'हिंदी', text:'मेरे AI मॉडल ने अपनी पहली Indic poem generate की — और यह stunning है! 🤩 देखें 👇', isImageCard:true, images:[{bg:'linear-gradient(135deg,#f8e8ff,#d8c0ff)',emoji:'🌸',caption:'AI-generated Hindi Poem'},{bg:'linear-gradient(135deg,#e8f5e9,#b2dfdb)',emoji:'🌿',caption:'Nature Theme Output'}], likes:'2.8K', comments:'143', action:'🔁 शेयर', tags:['all','images'] },
+  ],
+
+  ta: [
+    { id:201, type:'indic', av:'ப்', avColor:'#6366f1', name:'பிரியா நாயர்', time:'5 நிமிடங்கள் முன்', badge:'✅ சரிபார்க்கப்பட்டது', badgeClass:'badge-proof', postLang:'தமிழ்', text:'தமிழ் சட்ட தரவில் IndicBERT fine-tune செய்தேன் — NER-ல் 91% F1 மதிப்பெண். முழு config கீழே பகிர்கிறேன் 👇', img:'gb', imgEmoji:'🧠', likes:'1.4K', comments:'89', action:'▶️ இயக்கு', liked:true, tags:['all','indic'] },
+    { id:202, type:'discuss', av:'த', avColor:'#FF9933', name:'DevSpark இந்தியா', time:'1 மணி முன்', badge:'🔥 பிரபலம்', badgeClass:'badge-ai', postLang:'தமிழ்', text:'IndiaAI Mission GPU மானியங்கள் இப்போது கிடைக்கின்றன! 890+ GenAI நிறுவனங்கள் விண்ணப்பிக்கின்றன. நீங்களும் செய்யலாம் 🇮🇳', img:'gc', imgEmoji:'🏛️', likes:'3.8K', comments:'204', action:'🔁 பகிர்', tags:['all','discuss'] },
+    { id:203, type:'indic', av:'ர', avColor:'#0891b2', name:'ரவி குமார்', time:'2 மணி முன்', badge:'🇮🇳 Indic', badgeClass:'badge-proof', postLang:'தமிழ்', text:'உரையாடல் AI-க்கு எந்த Indic மொழி மாடல் சிறந்தது? 5 மொழிகளில் 6 மாடல்களை சோதித்தோம். நூல் 🧵', img:'gd', imgEmoji:'📊', likes:'2.1K', comments:'312', action:'🔁 பகிர்', tags:['all','indic','discuss'] },
+    { id:204, type:'audio', av:'ம', avColor:'#f43f5e', name:'MindfulAI பாட்', time:'3 மணி முன்', badge:'🎙️ ஆடியோ', badgeClass:'badge-ai', postLang:'தமிழ்', text:'LangChain மூலம் RAG pipeline கட்டுவது எப்படி என்று தமிழில் விளக்கினேன் 🎙️', isAudio:true, audioTitle:'RAG Pipeline — தமிழ் விளக்கம்', audioDuration:'24:30', likes:'890', comments:'67', action:'▶️ கேளுங்கள்', tags:['all','audio'] },
+    { id:205, type:'discuss', av:'வி', avColor:'#8b5cf6', name:'Sianap சமூகம்', time:'4 மணி முன்', badge:'💬 விவாதம்', badgeClass:'badge-proof', postLang:'தமிழ்', text:'Indic AI-ல் பங்களிக்க PhD தேவையில்லை. ஆர்வமும் உங்கள் தாய்மொழியும் போதும். 🇮🇳', likes:'5.2K', comments:'408', action:'🔁 பகிர்', tags:['all','discuss'] },
+  ],
+
+  kn: [
+    { id:301, type:'indic', av:'ಪ್', avColor:'#6366f1', name:'ಪ್ರಿಯಾ ನಾಯರ್', time:'5 ನಿಮಿಷಗಳ ಹಿಂದೆ', badge:'✅ ಪರಿಶೀಲಿಸಲಾಗಿದೆ', badgeClass:'badge-proof', postLang:'ಕನ್ನಡ', text:'ತಮಿಳು ಕಾನೂನು ಡೇಟಾದಲ್ಲಿ IndicBERT fine-tune ಮಾಡಿದೆ — NER ನಲ್ಲಿ 91% F1 ಸ್ಕೋರ್. ಪೂರ್ಣ config ಕೆಳಗೆ 👇', img:'gb', imgEmoji:'🧠', likes:'1.4K', comments:'89', action:'▶️ ರನ್ ಮಾಡಿ', liked:true, tags:['all','indic'] },
+    { id:302, type:'prompts', av:'ಕ', avColor:'#0891b2', name:'ಕಾವ್ಯಾ ರೆಡ್ಡಿ', time:'30 ನಿಮಿಷಗಳ ಹಿಂದೆ', badge:'⚡ ಪ್ರಾಂಪ್ಟ್', badgeClass:'badge-ai', postLang:'ಕನ್ನಡ', text:null, isPromptCard:true, promptTitle:'ಕನ್ನಡ ಸೆಂಟಿಮೆಂಟ್ ವಿಶ್ಲೇಷಕ', promptMeta:'ಕಾವ್ಯಾ ಅವರಿಂದ · 890 ರನ್ · ⭐ 4.8', promptBody:'"{{text}} ಕನ್ನಡ ಪಠ್ಯದ ಭಾವನೆಯನ್ನು positive, negative ಅಥವಾ neutral ಎಂದು ವರ್ಗೀಕರಿಸಿ. JSON ಹಿಂದಿರುಗಿಸಿ."', promptSaves:'2.1K ಉಳಿಸಲಾಗಿದೆ', tags:['all','prompts','indic'] },
+    { id:303, type:'discuss', av:'ದ', avColor:'#FF9933', name:'DevSpark ಭಾರತ', time:'1 ಗಂಟೆ ಹಿಂದೆ', badge:'🔥 ಟ್ರೆಂಡಿಂಗ್', badgeClass:'badge-ai', postLang:'ಕನ್ನಡ', text:'IndiaAI Mission GPU ಸಬ್ಸಿಡಿಗಳು ಲೈವ್ ಆಗಿವೆ! 890+ GenAI ಸ್ಟಾರ್ಟಪ್‌ಗಳು ಅರ್ಜಿ ಸಲ್ಲಿಸುತ್ತಿವೆ 🇮🇳', img:'gc', imgEmoji:'🏛️', likes:'3.8K', comments:'204', action:'🔁 ಹಂಚಿಕೊಳ್ಳಿ', tags:['all','discuss'] },
+    { id:304, type:'discuss', av:'ವಿ', avColor:'#8b5cf6', name:'Sianap ಸಮುದಾಯ', time:'4 ಗಂಟೆ ಹಿಂದೆ', badge:'💬 ಚರ್ಚೆ', badgeClass:'badge-proof', postLang:'ಕನ್ನಡ', text:'Indic AI ಗೆ ಕೊಡುಗೆ ನೀಡಲು PhD ಅಗತ್ಯವಿಲ್ಲ. ಕುತೂಹಲ ಮತ್ತು ನಿಮ್ಮ ಮಾತೃಭಾಷೆ ಸಾಕು. 🇮🇳', likes:'5.2K', comments:'408', action:'🔁 ಹಂಚಿಕೊಳ್ಳಿ', tags:['all','discuss'] },
+  ],
+
+  te: [
+    { id:401, type:'indic', av:'ప్', avColor:'#6366f1', name:'ప్రియా నాయర్', time:'5 నిమిషాల క్రితం', badge:'✅ ధృవీకరించబడింది', badgeClass:'badge-proof', postLang:'తెలుగు', text:'తమిళ న్యాయ డేటాపై IndicBERT fine-tune చేశాను — NER లో 91% F1 స్కోర్. పూర్తి config దిగువన 👇', img:'gb', imgEmoji:'🧠', likes:'1.4K', comments:'89', action:'▶️ రన్ చేయి', liked:true, tags:['all','indic'] },
+    { id:402, type:'discuss', av:'ద', avColor:'#FF9933', name:'DevSpark India', time:'1 గంట క్రితం', badge:'🔥 ట్రెండింగ్', badgeClass:'badge-ai', postLang:'తెలుగు', text:'IndiaAI Mission GPU సబ్సిడీలు ఇప్పుడు అందుబాటులో ఉన్నాయి! 890+ GenAI స్టార్టప్‌లు దరఖాస్తు చేస్తున్నాయి 🇮🇳', img:'gc', imgEmoji:'🏛️', likes:'3.8K', comments:'204', action:'🔁 షేర్', tags:['all','discuss'] },
+    { id:403, type:'discuss', av:'వి', avColor:'#8b5cf6', name:'Sianap సమాజం', time:'4 గంటల క్రితం', badge:'💬 చర్చ', badgeClass:'badge-proof', postLang:'తెలుగు', text:'Indic AI కి సహకరించడానికి PhD అవసరం లేదు. కుతూహలం మరియు మాతృభాష సరిపోతాయి. 🇮🇳', likes:'5.2K', comments:'408', action:'🔁 షేర్', tags:['all','discuss'] },
+    { id:404, type:'indic', av:'ర', avColor:'#0891b2', name:'రవి కుమార్', time:'2 గంటల క్రితం', badge:'🇮🇳 Indic', badgeClass:'badge-proof', postLang:'తెలుగు', text:'సంభాషణ AI కోసం ఏ Indic భాష మోడల్ ఉత్తమం? 5 భాషలలో 6 మోడల్స్ పరీక్షించాము 🧵', img:'gd', imgEmoji:'📊', likes:'2.1K', comments:'312', action:'🔁 షేర్', tags:['all','indic','discuss'] },
+  ],
+
+  pa: [
+    { id:501, type:'indic', av:'ਪ੍', avColor:'#6366f1', name:'ਪ੍ਰਿਆ ਨਾਇਰ', time:'5 ਮਿੰਟ ਪਹਿਲਾਂ', badge:'✅ ਤਸਦੀਕਸ਼ੁਦਾ AI', badgeClass:'badge-proof', postLang:'ਪੰਜਾਬੀ', text:'ਤਮਿਲ ਕਾਨੂੰਨੀ ਡੇਟਾ ਤੇ IndicBERT fine-tune ਕੀਤਾ — NER ਤੇ 91% F1 ਸਕੋਰ। ਪੂਰਾ config ਹੇਠਾਂ 👇', img:'gb', imgEmoji:'🧠', likes:'1.4K', comments:'89', action:'▶️ ਚਲਾਓ', liked:true, tags:['all','indic'] },
+    { id:502, type:'discuss', av:'ਦ', avColor:'#FF9933', name:'DevSpark ਇੰਡੀਆ', time:'1 ਘੰਟਾ ਪਹਿਲਾਂ', badge:'🔥 ਟਰੈਂਡਿੰਗ', badgeClass:'badge-ai', postLang:'ਪੰਜਾਬੀ', text:'IndiaAI Mission ਦੀਆਂ GPU ਸਬਸਿਡੀਆਂ ਹੁਣ ਲਾਈਵ ਹਨ! 890+ GenAI ਸਟਾਰਟਅੱਪ ਅਰਜ਼ੀ ਦੇ ਰਹੇ ਹਨ 🇮🇳', img:'gc', imgEmoji:'🏛️', likes:'3.8K', comments:'204', action:'🔁 ਸਾਂਝਾ ਕਰੋ', tags:['all','discuss'] },
+    { id:503, type:'discuss', av:'ਵਿ', avColor:'#8b5cf6', name:'Sianap ਭਾਈਚਾਰਾ', time:'4 ਘੰਟੇ ਪਹਿਲਾਂ', badge:'💬 ਚਰਚਾ', badgeClass:'badge-proof', postLang:'ਪੰਜਾਬੀ', text:'Indic AI ਵਿੱਚ ਯੋਗਦਾਨ ਦੇਣ ਲਈ PhD ਦੀ ਲੋੜ ਨਹੀਂ। ਉਤਸੁਕਤਾ ਅਤੇ ਆਪਣੀ ਮਾਂ-ਬੋਲੀ ਕਾਫ਼ੀ ਹੈ। 🇮🇳', likes:'5.2K', comments:'408', action:'🔁 ਸਾਂਝਾ ਕਰੋ', tags:['all','discuss'] },
+    { id:504, type:'audio', av:'ਮ', avColor:'#f43f5e', name:'MindfulAI ਪਾਡ', time:'3 ਘੰਟੇ ਪਹਿਲਾਂ', badge:'🎙️ ਆਡੀਓ', badgeClass:'badge-ai', postLang:'ਪੰਜਾਬੀ', text:'ਪੰਜਾਬੀ ਵਿੱਚ RAG pipeline ਬਣਾਉਣ ਬਾਰੇ ਪੂਰਾ podcast ਲਿਆਂਦਾ ਹੈ 🎙️', isAudio:true, audioTitle:'RAG Pipeline — ਪੰਜਾਬੀ ਗਾਈਡ', audioDuration:'24:30', likes:'890', comments:'67', action:'▶️ ਸੁਣੋ', tags:['all','audio'] },
+  ],
+
+  mr: [
+    { id:601, type:'indic', av:'प्', avColor:'#6366f1', name:'प्रिया नायर', time:'5 मिनिटांपूर्वी', badge:'✅ सत्यापित AI', badgeClass:'badge-proof', postLang:'मराठी', text:'Tamil कायदेशीर डेटावर IndicBERT fine-tune केले — NER मध्ये 91% F1 score. पूर्ण config खाली 👇', img:'gb', imgEmoji:'🧠', likes:'1.4K', comments:'89', action:'▶️ रन करा', liked:true, tags:['all','indic'] },
+    { id:602, type:'discuss', av:'द', avColor:'#FF9933', name:'DevSpark इंडिया', time:'1 तासापूर्वी', badge:'🔥 ट्रेंडिंग', badgeClass:'badge-ai', postLang:'मराठी', text:'IndiaAI Mission च्या GPU अनुदान आता उपलब्ध आहेत! 890+ GenAI स्टार्टअप आधीच अर्ज करत आहेत 🇮🇳', img:'gc', imgEmoji:'🏛️', likes:'3.8K', comments:'204', action:'🔁 शेअर करा', tags:['all','discuss'] },
+    { id:603, type:'images', av:'रि', avColor:'#f43f5e', name:'रिया मेहता', time:'9 तासांपूर्वी', badge:'📸 फोटो', badgeClass:'badge-ai', postLang:'मराठी', text:'माझ्या AI मॉडेलने generate केलेली Marathi folk art 🎨 Stable Diffusion + custom Marathi prompts वापरून!', isImageCard:true, images:[{bg:'linear-gradient(135deg,#fce4ec,#f8bbd0)',emoji:'🎨',caption:'AI Marathi Folk Art'},{bg:'linear-gradient(135deg,#fff8e1,#ffecb3)',emoji:'🌻',caption:'Style 2'}], likes:'3.2K', comments:'198', action:'🔁 शेअर करा', tags:['all','images'] },
+    { id:604, type:'discuss', av:'वि', avColor:'#8b5cf6', name:'Sianap समाज', time:'4 तासांपूर्वी', badge:'💬 चर्चा', badgeClass:'badge-proof', postLang:'मराठी', text:'Indic AI मध्ये योगदान देण्यासाठी PhD लागत नाही. कुतूहल आणि आपली मातृभाषा पुरेशी आहे. 🇮🇳', likes:'5.2K', comments:'408', action:'🔁 शेअर करा', tags:['all','discuss'] },
+  ]
+};
+
+function getTranslation() { return null; } // posts are natively written per language
+
+function renderTranslateBar() { return ''; } // translation handled by native posts
+
+function toggleTranslate() {}
+
+
+
+// feedData is now sourced dynamically via feedByLang[currentLang] in renderFeed()
+
+// Sample comments per post
+const sampleComments = {
+  default: [
+    { av:'PN', color:'#6366f1', name:'Priya Nair', text:'This is exactly what I needed! Thanks for sharing 🙌', time:'2m' },
+    { av:'RS', color:'#22c55e', name:'Rahul S.', text:'Great work, will try this on my dataset too.', time:'8m' },
+    { av:'KV', color:'#FF9933', name:'Kavya V.', text:'Can you share the training script as well?', time:'15m' },
+  ],
+  1: [
+    { av:'RS', color:'#22c55e', name:'Rahul Sharma', text:'Excellent F1 score! Which dataset did you use for pre-training?', time:'3m' },
+    { av:'MK', color:'#f43f5e', name:'Meera K.', text:'Been waiting for someone to try this on legal Tamil data 🔥', time:'7m' },
+  ],
+  3: [
+    { av:'AI', color:'#0891b2', name:'Arjun Iyer', text:'Applied yesterday, process was smooth!', time:'1m' },
+    { av:'DS', color:'#8b5cf6', name:'Deepa S.', text:'Is this open to individual developers or only startups?', time:'5m' },
+    { av:'VN', color:'#FF9933', name:'Vijay N.', text:'IndiaAI is really pushing the ecosystem forward 🇮🇳', time:'12m' },
+  ]
+};
+
+function getComments(postId) {
+  return sampleComments[postId] || sampleComments.default;
+}
+
+function renderComments(postId) {
+  const comments = getComments(postId);
+  return comments.map(c => `
+    <div class="comment-item">
+      <div class="comment-av" style="background:${c.color};color:#fff;">${c.av}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="comment-name">${c.name}</div>
+        <div class="comment-text">${c.text}</div>
+      </div>
+      <div class="comment-time">${c.time}</div>
+    </div>`).join('') + `
+    <div class="comment-input-row">
+      <div class="comment-av" style="background:linear-gradient(135deg,#6366f1,#FF9933);color:#fff;font-size:10px;">AS</div>
+      <input class="comment-input" placeholder="Add a comment…" onkeydown="if(event.key==='Enter')submitComment(this,${postId})">
+    </div>`;
+}
+
+function submitComment(input, postId) {
+  const val = input.value.trim();
+  if (!val) return;
+  const panel = document.getElementById('comments-' + postId);
+  const inputRow = panel.querySelector('.comment-input-row');
+  const newComment = document.createElement('div');
+  newComment.className = 'comment-item';
+  newComment.innerHTML = `
+    <div class="comment-av" style="background:linear-gradient(135deg,#6366f1,#FF9933);color:#fff;font-size:10px;">AS</div>
+    <div style="flex:1;min-width:0;">
+      <div class="comment-name">Amandeep Singh</div>
+      <div class="comment-text">${val}</div>
+    </div>
+    <div class="comment-time">now</div>`;
+  panel.insertBefore(newComment, inputRow);
+  input.value = '';
+  // Update comment count
+  const countEl = document.getElementById('ccount-' + postId);
+  if (countEl) {
+    const n = parseInt(countEl.textContent.replace(/\D/g,'')) || 0;
+    countEl.textContent = '💬 ' + (n + 1);
+  }
+}
+
+function toggleLike(el, postId) {
+  const isLiked = el.classList.toggle('liked');
+  const countEl = document.getElementById('lcount-' + postId);
+  if (!countEl) return;
+  const raw = parseInt(countEl.getAttribute('data-count') || '0');
+  const newCount = isLiked ? raw + 1 : raw - 1;
+  countEl.setAttribute('data-count', newCount);
+  countEl.textContent = newCount >= 1000 ? (newCount/1000).toFixed(1).replace('.0','') + 'K' : newCount;
+}
+
+function toggleComments(postId) {
+  const panel = document.getElementById('comments-' + postId);
+  if (!panel) return;
+  if (!panel.dataset.loaded) {
+    panel.innerHTML = renderComments(postId);
+    panel.dataset.loaded = '1';
+  }
+  panel.classList.toggle('open');
+}
+
+function handleShare(postId) {
+  const el = document.getElementById('scount-' + postId);
+  if (!el) return;
+  const raw = parseInt(el.getAttribute('data-count') || '0');
+  el.setAttribute('data-count', raw + 1);
+  el.textContent = (raw + 1) >= 1000 ? ((raw+1)/1000).toFixed(1).replace('.0','') + 'K' : (raw + 1);
+  el.closest('.pact').style.color = '#22c55e';
+  setTimeout(() => el.closest('.pact').style.color = '', 600);
+}
+
+function toggleSave(el) {
+  el.classList.toggle('saved');
+}
+
+function postActions(p) {
+  const likeCount = p.likes || '0';
+  const likeRaw = likeCount.includes('K') ? Math.round(parseFloat(likeCount)*1000) : parseInt(likeCount) || 0;
+  const commentCount = p.comments || '0';
+  const shareCount = p.shareCount || Math.floor(likeRaw * 0.08) || 12;
+  return `
+    <div class="post-actions">
+      <div class="pact${p.liked?' liked':''}" onclick="toggleLike(this,${p.id})">
+        ❤️ <span id="lcount-${p.id}" data-count="${likeRaw}">${p.likes}</span>
+      </div>
+      <div class="pact" onclick="toggleComments(${p.id})">
+        💬 <span id="ccount-${p.id}">${commentCount}</span>
+      </div>
+      <div class="pact" onclick="handleShare(${p.id})">
+        🔁 <span id="scount-${p.id}" data-count="${shareCount}">${shareCount}</span>
+      </div>
+      <div class="pact" onclick="toggleSave(this)">🔖 Save</div>
+    </div>
+    <div class="comment-panel" id="comments-${p.id}"></div>`;
+}
+
+function buildPostCard(p) {
+  const lang = currentLang;
+
+  if (p.isPromptCard) {
+    return `
+      <div class="prompt-card">
+        <div class="pc-head">
+          <div class="pc-icon" style="background:linear-gradient(135deg,#f0f0ff,#e8e8ff);">⚡</div>
+          <div>
+            <div class="pc-name">${p.promptTitle}</div>
+            <div class="pc-meta">${p.promptMeta}</div>
+          </div>
+          <div class="pc-lang">${p.postLang}</div>
+        </div>
+        <div class="pc-body">${p.promptBody}</div>
+        <div class="pc-footer">
+          <button class="btn-run">▶ Run</button>
+          <button class="btn-copy">Copy</button>
+          <div class="pc-stat">${p.promptSaves}</div>
+        </div>
+      </div>`;
+  }
+
+  if (p.isImageCard) {
+    const trans = renderTranslateBar(p.id, p.text, lang);
+    const imgs = p.images;
+    let imgHTML;
+    if (imgs.length === 1) {
+      imgHTML = `<div style="margin:0 12px 12px;border-radius:14px;overflow:hidden;height:160px;background:${imgs[0].bg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
+        <span style="font-size:52px;">${imgs[0].emoji}</span>
+        <span style="font-size:11px;color:#888;font-weight:500;">${imgs[0].caption}</span>
+      </div>`;
+    } else if (imgs.length === 2) {
+      imgHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 12px 12px;">
+        ${imgs.map(img=>`<div style="border-radius:12px;height:110px;background:${img.bg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;"><span style="font-size:34px;">${img.emoji}</span><span style="font-size:10px;color:#888;">${img.caption}</span></div>`).join('')}
+      </div>`;
+    } else {
+      imgHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 12px 12px;">
+        <div style="grid-row:span 2;border-radius:12px;background:${imgs[0].bg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;min-height:150px;"><span style="font-size:42px;">${imgs[0].emoji}</span><span style="font-size:10px;color:#888;">${imgs[0].caption}</span></div>
+        ${imgs.slice(1).map(img=>`<div style="border-radius:12px;height:72px;background:${img.bg};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;"><span style="font-size:26px;">${img.emoji}</span><span style="font-size:9px;color:#888;">${img.caption}</span></div>`).join('')}
+      </div>`;
+    }
+    return `<div class="card">
+      <div class="post-header">
+        <div class="post-av" style="background:${p.avColor};">${p.av}</div>
+        <div><div class="post-name">${p.name}</div><div class="post-time">${p.time} · <span style="background:#fff3e0;color:#e65100;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;">${p.postLang}</span></div></div>
+        <div class="post-badge ${p.badgeClass}">${p.badge}</div>
+      </div>
+      <div class="post-text">${p.text}</div>${trans}${imgHTML}
+      ${postActions(p)}
+    </div>`;
+  }
+
+  if (p.isVideoCard) {
+    return `<div class="card">
+      <div class="post-header">
+        <div class="post-av" style="background:${p.avColor};">${p.av}</div>
+        <div><div class="post-name">${p.name}</div><div class="post-time">${p.time} · <span style="background:#fff3e0;color:#e65100;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;">${p.postLang}</span></div></div>
+        <div class="post-badge ${p.badgeClass}">${p.badge}</div>
+      </div>
+      <div style="margin:0 12px 12px;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;">
+        <div class="post-img ${p.videoBg}" style="height:130px;border-radius:14px;font-size:40px;">${p.videoEmoji}</div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+          <div style="width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;">▶</div>
+        </div>
+        <div style="position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,0.65);color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;">${p.videoDur}</div>
+      </div>
+      <div style="padding:0 14px 4px;font-size:13px;font-weight:600;color:#111;">${p.videoTitle}</div>
+      <div style="padding:0 14px 12px;font-size:11px;color:#aaa;">👁 ${p.videoViews}</div>
+      ${postActions(p)}
+    </div>`;
+  }
+
+  if (p.isAudio) {
+    const trans = renderTranslateBar(p.id, p.text, lang);
+    return `<div class="card">
+      <div class="post-header">
+        <div class="post-av" style="background:${p.avColor};">${p.av}</div>
+        <div><div class="post-name">${p.name}</div><div class="post-time">${p.time} · <span style="background:#fff3e0;color:#e65100;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;">${p.postLang}</span></div></div>
+        <div class="post-badge ${p.badgeClass}">${p.badge}</div>
+      </div>
+      <div class="post-text">${p.text}</div>${trans}
+      <div style="margin:0 12px 12px;background:#f8f8fc;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f43f5e,#FF9933);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0;cursor:pointer;">▶</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:#111;margin-bottom:4px;">${p.audioTitle}</div>
+          <div style="height:4px;background:#eee;border-radius:2px;overflow:hidden;"><div style="height:100%;width:35%;background:linear-gradient(90deg,#f43f5e,#FF9933);border-radius:2px;"></div></div>
+        </div>
+        <div style="font-size:11px;color:#aaa;flex-shrink:0;">${p.audioDuration}</div>
+      </div>
+      ${postActions(p)}
+    </div>`;
+  }
+
+  const trans = renderTranslateBar(p.id, p.text, lang);
+  return `
+    <div class="card">
+      <div class="post-header">
+        <div class="post-av" style="background:${p.avColor};">${p.av}</div>
+        <div><div class="post-name">${p.name}</div>
+          <div class="post-time">${p.time} · <span style="background:#fff3e0;color:#e65100;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;">${p.postLang}</span></div>
+        </div>
+        <div class="post-badge ${p.badgeClass}">${p.badge}</div>
+      </div>
+      ${p.text ? `<div class="post-text">${p.text}</div>${trans}` : ''}
+      ${p.img ? `<div class="post-img ${p.img}">${p.imgEmoji}</div>` : ''}
+      ${postActions(p)}
+    </div>`;
+}
+
+function renderFeed(filter) {
+  const list = document.getElementById('feed-list');
+  const source = feedByLang[currentLang] || feedByLang['en'];
+  const items = source.filter(p => p.tags.includes(filter));
+  list.style.opacity = 0;
+  setTimeout(() => {
+    list.innerHTML = items.map(buildPostCard).join('');
+    list.style.transition = 'opacity .2s';
+    list.style.opacity = 1;
+  }, 100);
+}
+
+function feedFilter(filter, el) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderFeed(filter);
+}
+
+function setLang(lang) {
+  currentLang = lang;
+
+  // Apply native font to the feed area
+  const font = langFonts[lang] || 'Inter';
+  const feedEl = document.getElementById('tab-feed');
+  if (feedEl) {
+    feedEl.style.fontFamily = `'${font}', sans-serif`;
+    // Mark Indic scripts for larger line-height CSS
+    const isIndic = ['hi','pa','ta','kn','te','mr'].includes(lang);
+    feedEl.setAttribute('lang-script', isIndic ? 'indic' : 'latin');
+  }
+
+  // Update language banner
+  const banner = document.getElementById('lang-banner');
+  const langNameEl = document.getElementById('lang-name');
+  if (lang !== 'en') {
+    banner.style.display = 'flex';
+    langNameEl.textContent = langNames[lang];
+  } else {
+    banner.style.display = 'none';
+    if (feedEl) feedEl.style.fontFamily = "'Inter', sans-serif";
+  }
+
+  // Update select display text
+  const sel = document.getElementById('langSelect');
+  if (sel) sel.value = lang;
+
+  // Re-render feed with new language posts
+  const activeChip = document.querySelector('#tab-feed .chip.on');
+  const chipText = activeChip ? activeChip.textContent.trim() : 'All';
+  const filterMap = {
+    'All':'all', '⚡ Prompts':'prompts', '🎬 Videos':'videos',
+    '📸 Images':'images', '🎙️ Audio':'audio',
+    '🇮🇳 Indic Models':'indic', '💬 Discuss':'discuss'
+  };
+  const filter = filterMap[chipText] || 'all';
+  renderFeed(filter);
+}
+
+// Feed init handled in window.onload below
+
+// ── News tab ──
+const newsData = {
+  all: [
+    { bg:'gc', icon:'🏛️', src:'IndiaAI Mission', title:'GPU subsidies for GenAI startups — how to apply before March 31', meta:'1h ago', pill:true, tags:['all','indiaai','policy'] },
+    { bg:'ga', icon:'🤖', src:'TechCrunch India', title:'890+ GenAI startups: The full map of India\'s AI ecosystem in 2026', meta:'4h ago', pill:true, tags:['all','indiaai','funding'] },
+    { bg:'gb', icon:'🌐', src:'ai4bharat', title:'IndicBERT v3 released — supports all 22 scheduled Indian languages', meta:'8h ago · 5 min read', pill:false, tags:['all','research'] },
+    { bg:'gd', icon:'💰', src:'Inc42', title:'Indian GenAI startups raised $2.1B in 2025 — 2026 looks bigger', meta:'1d ago', pill:true, tags:['all','funding'] },
+    { bg:'ge', icon:'📜', src:'MeitY', title:'India\'s Digital Personal Data Protection Act: What AI builders must know', meta:'2d ago · 6 min read', pill:false, tags:['all','policy'] },
+    { bg:'gc', icon:'🔬', src:'IIT Madras AI Lab', title:'New multilingual benchmark for Indic NLP tasks released — outperforms GLUE', meta:'3d ago', pill:true, tags:['all','research'] },
+  ]
+};
+
+function renderNews(filter) {
+  const list = document.getElementById('news-list');
+  const items = newsData.all.filter(n => n.tags.includes(filter));
+  if (!items.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#aaa;font-size:14px;">No articles found.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(n => `
+    <div class="ncard">
+      <div class="nthumb ${n.bg}">${n.icon}</div>
+      <div class="nbody">
+        <div class="nsrc">${n.src}</div>
+        <div class="ntitle">${n.title}</div>
+        <div class="nmeta">${n.meta}${n.pill ? ' · <span class="ai-pill">✦ AI Summary</span>' : ''}</div>
+      </div>
+    </div>`).join('');
+}
+
+function newsFilter(filter, el) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  const box = document.getElementById('news-list');
+  box.style.opacity = 0;
+  setTimeout(() => { renderNews(filter); box.style.transition='opacity .2s'; box.style.opacity=1; }, 120);
+}
+
+// News init handled in window.onload below
+
+// ── Schedule tab ──
+// ── Schedule helpers ──
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+// Scheduled posts data — days relative to today (0=today, 1=tomorrow, etc.)
+const scheduledPosts = [
+  { relDay: 0, time: '9 AM',    color: '#FF9933', name: 'Hindi Prompt Drop: RAG Guide',         platform: '🟡 Sianap · 🔵 LinkedIn' },
+  { relDay: 0, time: '2 PM',    color: '#22c55e', name: 'IndicBERT Tutorial Video',             platform: '📸 Instagram · 🟡 Sianap Gallery' },
+  { relDay: 0, time: '7:30 PM', color: '#6366f1', name: 'IndiaAI GPU Subsidy Thread',           platform: '🔵 LinkedIn · AI-optimised time' },
+  { relDay: 1, time: '10 AM',   color: '#FF9933', name: 'Tamil NLP Carousel Post',              platform: '📸 Instagram' },
+  { relDay: 3, time: '6 PM',    color: '#6366f1', name: 'Sianap Community Update',              platform: '🟡 Sianap · 🔵 LinkedIn' },
+  { relDay: 5, time: '9 AM',    color: '#22c55e', name: 'Kannada Prompt: Sentiment Analyser',   platform: '🟡 Sianap' },
+  { relDay: 7, time: '11 AM',   color: '#f43f5e', name: 'IndiaAI Community Summit — Promo',     platform: '🔵 LinkedIn · 📘 Facebook' },
+  { relDay: 9, time: '8 AM',    color: '#FF9933', name: 'Monthly AI Roundup Newsletter',        platform: '🟡 Sianap · 🔵 LinkedIn' },
+];
+
+function calViewState() {
+  // Keep track of which month is being displayed
+  if (!window._calView) {
+    const n = new Date();
+    window._calView = { year: n.getFullYear(), month: n.getMonth() };
+  }
+  return window._calView;
+}
+
+function buildCalendar() {
+  const c = document.getElementById('calCells');
+  if (!c) return;
+
+  const now = new Date();
+  const todayD = now.getDate(), todayM = now.getMonth(), todayY = now.getFullYear();
+
+  const view = calViewState();
+  const { year, month } = view;
+
+  // Update header
+  const hdr = document.querySelector('.cal-month');
+  if (hdr) hdr.textContent = MONTH_NAMES[month] + ' ' + year;
+
+  // Which days have events this month?
+  const eventDays = new Set();
+  scheduledPosts.forEach(p => {
+    const d = new Date(now); d.setDate(now.getDate() + p.relDay);
+    if (d.getFullYear() === year && d.getMonth() === month) eventDays.add(d.getDate());
+  });
+
+  // First day of month (0=Sun)
+  const firstDay = new Date(year, month, 1).getDay();
+  // Days in month
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  // Days in prev month
+  const daysInPrev = new Date(year, month, 0).getDate();
+
+  c.innerHTML = '';
+
+  // Prev month overflow
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const e = document.createElement('div');
+    e.className = 'cell om'; e.textContent = daysInPrev - i; c.appendChild(e);
+  }
+
+  // This month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const e = document.createElement('div');
+    e.className = 'cell';
+    const isToday = d === todayD && month === todayM && year === todayY;
+    if (isToday) e.classList.add('today');
+    if (eventDays.has(d)) e.classList.add('has-event');
+    e.textContent = d;
+    e.onclick = () => showDaySchedule(year, month, d);
+    c.appendChild(e);
+  }
+
+  // Next month overflow to fill grid (total cells should be multiple of 7)
+  const total = firstDay + daysInMonth;
+  const remainder = total % 7;
+  if (remainder > 0) {
+    for (let d = 1; d <= 7 - remainder; d++) {
+      const e = document.createElement('div');
+      e.className = 'cell om'; e.textContent = d; c.appendChild(e);
+    }
+  }
+
+  // Render today's schedule below
+  renderDaySchedule(year, month, todayD);
+}
+
+function showDaySchedule(year, month, day) {
+  // Highlight clicked cell
+  document.querySelectorAll('#calCells .cell').forEach(c => c.style.outline = '');
+  renderDaySchedule(year, month, day);
+}
+
+function renderDaySchedule(year, month, day) {
+  const lbl = document.getElementById('sched-day-label');
+  const list = document.getElementById('sched-day-list');
+  if (!lbl || !list) return;
+
+  const now = new Date();
+  const target = new Date(year, month, day);
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.round((target - todayMidnight) / 86400000);
+
+  // Day label
+  const dayName = DAY_NAMES[target.getDay()];
+  const isToday = diffDays === 0;
+  const isTomorrow = diffDays === 1;
+  const labelStr = isToday ? `Today — ${dayName}, ${SHORT_MONTHS[month]} ${day}`
+                 : isTomorrow ? `Tomorrow — ${dayName}, ${SHORT_MONTHS[month]} ${day}`
+                 : `${dayName}, ${SHORT_MONTHS[month]} ${day}`;
+  lbl.textContent = labelStr;
+
+  // Posts for this day
+  const posts = scheduledPosts.filter(p => {
+    const pd = new Date(now); pd.setDate(now.getDate() + p.relDay);
+    return pd.getFullYear() === year && pd.getMonth() === month && pd.getDate() === day;
+  });
+
+  if (posts.length === 0) {
+    list.innerHTML = `<div style="padding:20px;text-align:center;color:#aaa;font-size:13px;">📭 No posts scheduled for this day.<br><span style="color:#6366f1;font-weight:600;cursor:pointer;" onclick="">+ Schedule something</span></div>`;
+    return;
+  }
+
+  list.innerHTML = posts.map(p => `
+    <div class="sched">
+      <div class="sched-t">${p.time}</div>
+      <div class="sched-dot" style="background:${p.color};"></div>
+      <div class="sched-body">
+        <div class="sched-name">${p.name}</div>
+        <div class="sched-pl">${p.platform}</div>
+      </div>
+    </div>`).join('');
+}
+
+function calPrevMonth() {
+  const v = calViewState();
+  if (v.month === 0) { v.month = 11; v.year--; } else { v.month--; }
+  buildCalendar();
+}
+function calNextMonth() {
+  const v = calViewState();
+  if (v.month === 11) { v.month = 0; v.year++; } else { v.month++; }
+  buildCalendar();
+}
+
+const scheduleContent = {
+  today: `
+    <div class="cal-head" style="padding:4px 20px 14px;">
+      <div class="cal-month"></div>
+      <div class="cal-nav"><button onclick="calPrevMonth()">‹</button><button onclick="calNextMonth()">›</button></div>
+    </div>
+    <div class="cal-grid">
+      <div class="day-row">
+        <div class="dl">S</div><div class="dl">M</div><div class="dl">T</div>
+        <div class="dl">W</div><div class="dl">T</div><div class="dl">F</div><div class="dl">S</div>
+      </div>
+      <div class="cells" id="calCells"></div>
+    </div>
+    <div class="section-label" id="sched-day-label">Today</div>
+    <div id="sched-day-list"></div>`,
+
+  upcoming: (() => {
+    const now = new Date();
+    const fmt = (relDay) => {
+      const d = new Date(now); d.setDate(now.getDate() + relDay);
+      return SHORT_MONTHS[d.getMonth()] + ' ' + d.getDate();
+    };
+    const upcoming = scheduledPosts.filter(p => p.relDay >= 1);
+    const thisWeek = upcoming.filter(p => p.relDay <= 6);
+    const nextWeek = upcoming.filter(p => p.relDay > 6);
+    const row = (p) => `
+      <div class="sched">
+        <div class="sched-t">${fmt(p.relDay)}</div>
+        <div class="sched-dot" style="background:${p.color};"></div>
+        <div class="sched-body">
+          <div class="sched-name">${p.name}</div>
+          <div class="sched-pl">${p.platform} · ${p.time} IST</div>
+        </div>
+      </div>`;
+    return `
+      <div class="section-label">This Week</div>
+      ${thisWeek.map(row).join('') || '<div style="padding:12px 20px;font-size:13px;color:#aaa;">Nothing scheduled this week yet.</div>'}
+      <div class="section-label">Next Week & Beyond</div>
+      ${nextWeek.map(row).join('') || '<div style="padding:12px 20px;font-size:13px;color:#aaa;">Nothing scheduled beyond this week yet.</div>'}`;
+  })(),
+
+  roadmap: `
+    <div class="phase">
+      <div class="ph-num" style="background:#fff3e0;color:#e65100;">1</div>
+      <div>
+        <div class="ph-title">Community</div>
+        <div class="ph-desc">Feed, prompt library, Proof-of-AI labels, Indic language support.</div>
+        <div class="ph-tag" style="background:#e8f5e9;color:#2e7d32;">🟢 Live Now</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="ph-num" style="background:#f0f0ff;color:#6366f1;">2</div>
+      <div>
+        <div class="ph-title">Model Sandbox</div>
+        <div class="ph-desc">Run Indic LLMs inside Sianap. Pro API access. GPU inference.</div>
+        <div class="ph-tag" style="background:#f0f0ff;color:#6366f1;">🔵 Q3 2026</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="ph-num" style="background:#f0fffe;color:#0891b2;">3</div>
+      <div>
+        <div class="ph-title">AI Mentorship — EduPulse</div>
+        <div class="ph-desc">1-on-1 mentorship, verified talent portal, B2B recruitment.</div>
+        <div class="ph-tag" style="background:#f0fffe;color:#0891b2;">⚪ Q1 2027</div>
+      </div>
+    </div>`
+};
+
+function scheduleFilter(type, el) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  const box = document.getElementById('schedule-content');
+  box.style.opacity = 0;
+  // Rebuild upcoming dynamically each time (dates change daily)
+  if (type === 'upcoming') {
+    const now = new Date();
+    const fmt = (relDay) => {
+      const d = new Date(now); d.setDate(now.getDate() + relDay);
+      return SHORT_MONTHS[d.getMonth()] + ' ' + d.getDate();
+    };
+    const upcoming = scheduledPosts.filter(p => p.relDay >= 1);
+    const thisWeek = upcoming.filter(p => p.relDay <= 6);
+    const nextWeek = upcoming.filter(p => p.relDay > 6);
+    const row = (p) => `
+      <div class="sched">
+        <div class="sched-t">${fmt(p.relDay)}</div>
+        <div class="sched-dot" style="background:${p.color};"></div>
+        <div class="sched-body">
+          <div class="sched-name">${p.name}</div>
+          <div class="sched-pl">${p.platform} · ${p.time} IST</div>
+        </div>
+      </div>`;
+    scheduleContent.upcoming = `
+      <div class="section-label">This Week</div>
+      ${thisWeek.map(row).join('') || '<div style="padding:12px 20px;font-size:13px;color:#aaa;">Nothing this week yet.</div>'}
+      <div class="section-label">Next Week & Beyond</div>
+      ${nextWeek.map(row).join('') || '<div style="padding:12px 20px;font-size:13px;color:#aaa;">Nothing beyond this week yet.</div>'}`;
+  }
+  setTimeout(() => {
+    box.innerHTML = scheduleContent[type];
+    box.style.transition = 'opacity .2s'; box.style.opacity = 1;
+    if (type === 'today') {
+      // Reset view to current month/year
+      const n = new Date();
+      window._calView = { year: n.getFullYear(), month: n.getMonth() };
+      buildCalendar();
+    }
+  }, 120);
+}
+
+
+// ── Stats tab ──
+const statsContent = {
+  overview: `
+    <div style="margin:0 16px 12px;background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-size:12px;color:#FF9933;font-weight:700;margin-bottom:4px;">✦ AI Insight</div>
+      <div style="font-size:13px;color:#444;line-height:1.5;">Hindi prompt posts outperform English by <b>2.4×</b>. Post 2 more Indic prompts next week to hit <b>50K impressions</b>.</div>
+    </div>
+    <div class="stat-grid">
+      <div class="scard"><div class="sico">👁️</div><div class="sval">62.4K</div><div class="slbl">Impressions</div><div class="schg up">↑ 41%</div></div>
+      <div class="scard"><div class="sico">⚡</div><div class="sval">5,210</div><div class="slbl">Prompt Runs</div><div class="schg up">↑ 88%</div></div>
+      <div class="scard"><div class="sico">👥</div><div class="sval">+412</div><div class="slbl">New Followers</div><div class="schg up">↑ 29%</div></div>
+      <div class="scard"><div class="sico">✅</div><div class="sval">98</div><div class="slbl">Verified Posts</div><div class="schg up">↑ 12%</div></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-head"><div class="chart-ttl">Weekly Impressions</div><div class="chart-prd">This Week</div></div>
+      <div class="bars" id="barChart"></div>
+    </div>`,
+
+  posts: `
+    <div class="stat-grid">
+      <div class="scard"><div class="sico">📝</div><div class="sval">34</div><div class="slbl">Posts This Month</div><div class="schg up">↑ 18%</div></div>
+      <div class="scard"><div class="sico">❤️</div><div class="sval">8.4K</div><div class="slbl">Total Likes</div><div class="schg up">↑ 32%</div></div>
+      <div class="scard"><div class="sico">💬</div><div class="sval">1,280</div><div class="slbl">Comments</div><div class="schg up">↑ 21%</div></div>
+      <div class="scard"><div class="sico">🔁</div><div class="sval">640</div><div class="slbl">Shares</div><div class="schg up">↑ 15%</div></div>
+    </div>
+    <div style="margin:0 16px 12px;background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:12px;">Top Posts</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${[
+          ['Hindi RAG prompt: 10K saves in 3 days','👁 22K · ❤️ 1.4K · ▶ 3.2K runs'],
+          ['IndicBERT Tamil NER — full guide','👁 14K · ❤️ 890 · ▶ 1.8K runs'],
+          ['How I got IndiaAI GPU credits','👁 9.6K · ❤️ 620 · 💬 188'],
+        ].map((p,i) => `
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div style="font-size:15px;font-weight:700;color:#ddd;min-width:22px;">${i+1}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;color:#111;margin-bottom:2px;">${p[0]}</div>
+              <div style="font-size:11px;color:#aaa;">${p[1]}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`,
+
+  prompts: `
+    <div class="stat-grid">
+      <div class="scard"><div class="sico">⚡</div><div class="sval">5,210</div><div class="slbl">Total Runs</div><div class="schg up">↑ 88%</div></div>
+      <div class="scard"><div class="sico">🔖</div><div class="sval">9,800</div><div class="slbl">Total Saves</div><div class="schg up">↑ 54%</div></div>
+      <div class="scard"><div class="sico">✅</div><div class="sval">12</div><div class="slbl">Verified Prompts</div><div class="schg up">↑ 20%</div></div>
+      <div class="scard"><div class="sico">⭐</div><div class="sval">4.9</div><div class="slbl">Avg Rating</div><div class="schg up">↑ 0.2</div></div>
+    </div>
+    <div style="margin:0 16px 12px;background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:12px;">Top Prompts</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${[
+          ['Hindi Summariser','▶ 3.2K runs · 🔖 4.4K saves','Hindi'],
+          ['Kannada Sentiment Analyser','▶ 890 runs · 🔖 2.1K saves','Kannada'],
+          ['LinkedIn Post Writer (India)','▶ 5.6K runs · 🔖 6.8K saves','English'],
+        ].map((p,i) => `
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div style="font-size:15px;font-weight:700;color:#ddd;min-width:22px;">${i+1}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:600;color:#111;margin-bottom:2px;">${p[0]}</div>
+              <div style="font-size:11px;color:#aaa;">${p[1]}</div>
+            </div>
+            <div style="background:#fff3e0;color:#e65100;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;">${p[2]}</div>
+          </div>`).join('')}
+      </div>
+    </div>`,
+
+  audience: `
+    <div class="stat-grid">
+      <div class="scard"><div class="sico">👥</div><div class="sval">10.4K</div><div class="slbl">Total Followers</div><div class="schg up">↑ 29%</div></div>
+      <div class="scard"><div class="sico">🌍</div><div class="sval">82%</div><div class="slbl">India-based</div><div class="schg up">↑ 4%</div></div>
+      <div class="scard"><div class="sico">🔥</div><div class="sval">68%</div><div class="slbl">Engagement Rate</div><div class="schg up">↑ 11%</div></div>
+      <div class="scard"><div class="sico">📱</div><div class="sval">91%</div><div class="slbl">Mobile Users</div><div class="schg dn">↓ 2%</div></div>
+    </div>
+    <div style="margin:0 16px 12px;background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:12px;">Top Cities</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${[
+          ['Bangalore','28%',28],['Mumbai','22%',22],['Hyderabad','18%',18],['Chennai','14%',14],['Delhi','10%',10]
+        ].map(c => `
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:13px;color:#444;">📍 ${c[0]}</span>
+              <span style="font-size:12px;font-weight:600;color:#111;">${c[1]}</span>
+            </div>
+            <div style="height:6px;background:#f0f0f5;border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:${c[2]*3}px;background:linear-gradient(90deg,#FF9933,#6366f1);border-radius:3px;max-width:100%;"></div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`
+};
+
+function statsFilter(type, el) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  const box = document.getElementById('stats-content');
+  box.style.opacity = 0;
+  setTimeout(() => {
+    box.innerHTML = statsContent[type];
+    box.style.transition = 'opacity .2s'; box.style.opacity = 1;
+    if (type === 'overview') buildBarChart();
+  }, 120);
+}
+
+function buildBarChart() {
+  const ch = document.getElementById('barChart');
+  if (!ch) return;
+  ch.innerHTML = '';
+  const data = [{d:'S',v:32},{d:'M',v:55},{d:'T',v:72},{d:'W',v:92},{d:'T',v:65},{d:'F',v:88},{d:'S',v:50}];
+  data.forEach(item => {
+    const w = document.createElement('div');
+    w.className = 'bw';
+    w.innerHTML = `<div class="b" style="height:${item.v}%;background:${item.v>=88?'#FF9933':'#e8e8f0'};"></div><div class="bl">${item.d}</div>`;
+    ch.appendChild(w);
+  });
+}
+
+// Stats init handled in window.onload below
+const libraryContent = {
+  prompts: `
+    <div class="prompt-card">
+      <div class="pc-head">
+        <div class="pc-icon">🧠</div>
+        <div>
+          <div class="pc-name">Kannada Sentiment</div>
+          <div class="pc-meta">by Meena R. · 890 runs · ⭐ 4.8</div>
+        </div>
+        <div class="pc-lang">Kannada</div>
+      </div>
+      <div class="pc-body">"Classify sentiment of this Kannada text as positive, negative, or neutral. Return JSON. Text: {{text}}"</div>
+      <div class="pc-footer">
+        <button class="btn-run">▶ Run</button>
+        <button class="btn-copy">Copy</button>
+        <div class="pc-stat">2.1K saves</div>
+      </div>
+    </div>
+    <div class="prompt-card">
+      <div class="pc-head">
+        <div class="pc-icon">📝</div>
+        <div>
+          <div class="pc-name">LinkedIn Post (India)</div>
+          <div class="pc-meta">by Sianap AI · 5.6K runs · ⭐ 4.9</div>
+        </div>
+        <div class="pc-lang">English</div>
+      </div>
+      <div class="pc-body">"Write a LinkedIn post about {{topic}} for Indian startup audience. Use natural Hinglish. 200 words max."</div>
+      <div class="pc-footer">
+        <button class="btn-run">▶ Run</button>
+        <button class="btn-copy">Copy</button>
+        <div class="pc-stat">4.4K saves</div>
+      </div>
+    </div>
+    <div class="prompt-card">
+      <div class="pc-head">
+        <div class="pc-icon">⚡</div>
+        <div>
+          <div class="pc-name">Hindi Summariser</div>
+          <div class="pc-meta">by Arjun S. · 1.2K runs · ⭐ 4.9</div>
+        </div>
+        <div class="pc-lang">Hindi</div>
+      </div>
+      <div class="pc-body">"Summarise {{text}} in Hindi in 3 bullet points under 15 words each."</div>
+      <div class="pc-footer">
+        <button class="btn-run">▶ Run</button>
+        <button class="btn-copy">Copy</button>
+        <div class="pc-stat">3.8K saves</div>
+      </div>
+    </div>
+    <div class="prompt-card">
+      <div class="pc-head">
+        <div class="pc-icon">🔤</div>
+        <div>
+          <div class="pc-name">Tamil → English Translator</div>
+          <div class="pc-meta">by Ravi K. · 760 runs · ⭐ 4.7</div>
+        </div>
+        <div class="pc-lang">Tamil</div>
+      </div>
+      <div class="pc-body">"Translate {{text}} from Tamil to English. Keep technical terms in English."</div>
+      <div class="pc-footer">
+        <button class="btn-run">▶ Run</button>
+        <button class="btn-copy">Copy</button>
+        <div class="pc-stat">1.5K saves</div>
+      </div>
+    </div>`,
+
+  videos: `
+    <div class="vid-grid">
+      <div class="vid-cell">
+        <div class="vid-thumb ga">🤖<div class="vid-play">▶</div></div>
+        <div class="vid-info">
+          <div class="vid-lang">Hindi</div>
+          <div class="vid-title">Build a RAG in 20 Min</div>
+          <div class="vid-meta">👁 18K · ⭐ 4.9</div>
+        </div>
+      </div>
+      <div class="vid-cell">
+        <div class="vid-thumb gb">🌿<div class="vid-play">▶</div></div>
+        <div class="vid-info">
+          <div class="vid-lang">Tamil</div>
+          <div class="vid-title">IndicBERT Fine-tune</div>
+          <div class="vid-meta">👁 9.4K · ⭐ 4.7</div>
+        </div>
+      </div>
+      <div class="vid-cell">
+        <div class="vid-thumb gd">🚀<div class="vid-play">▶</div></div>
+        <div class="vid-info">
+          <div class="vid-lang">English</div>
+          <div class="vid-title">LangChain + FastAPI</div>
+          <div class="vid-meta">👁 14K · ⭐ 4.8</div>
+        </div>
+      </div>
+      <div class="vid-cell">
+        <div class="vid-thumb ge">🔬<div class="vid-play">▶</div></div>
+        <div class="vid-info">
+          <div class="vid-lang">Telugu</div>
+          <div class="vid-title">Diffusion Models</div>
+          <div class="vid-meta">👁 6.1K · ⭐ 4.6</div>
+        </div>
+      </div>
+      <div class="vid-cell">
+        <div class="vid-thumb gc">🧠<div class="vid-play">▶</div></div>
+        <div class="vid-info">
+          <div class="vid-lang">Hindi</div>
+          <div class="vid-title">Prompt Engineering 101</div>
+          <div class="vid-meta">👁 11K · ⭐ 4.9</div>
+        </div>
+      </div>
+      <div class="vid-cell">
+        <div class="vid-thumb ga">🌐<div class="vid-play">▶</div></div>
+        <div class="vid-info">
+          <div class="vid-lang">Kannada</div>
+          <div class="vid-title">GPT-4o API Walkthrough</div>
+          <div class="vid-meta">👁 7.3K · ⭐ 4.8</div>
+        </div>
+      </div>
+    </div>`,
+
+  notebooks: `
+    <div style="margin:0 16px 12px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="padding:14px;border-bottom:1px solid #f0f0f5;display:flex;gap:12px;align-items:center;">
+        <div style="width:42px;height:42px;border-radius:12px;background:#f0f0ff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📓</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:2px;">IndicBERT NER — Tamil Legal</div>
+          <div style="font-size:11px;color:#aaa;">by Priya N. · Python · 24 cells</div>
+        </div>
+        <div style="background:#e8f5e9;color:#2e7d32;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">✅ Verified</div>
+      </div>
+      <div style="padding:14px;border-bottom:1px solid #f0f0f5;display:flex;gap:12px;align-items:center;">
+        <div style="width:42px;height:42px;border-radius:12px;background:#fff3e0;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📒</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:2px;">RAG with LangChain + FastAPI</div>
+          <div style="font-size:11px;color:#aaa;">by Arjun S. · Python · 18 cells</div>
+        </div>
+        <div style="background:#fff3e0;color:#e65100;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">🔥 Popular</div>
+      </div>
+      <div style="padding:14px;border-bottom:1px solid #f0f0f5;display:flex;gap:12px;align-items:center;">
+        <div style="width:42px;height:42px;border-radius:12px;background:#f0fffe;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📔</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:2px;">Hindi Sentiment Classifier</div>
+          <div style="font-size:11px;color:#aaa;">by Sianap AI · Python · 12 cells</div>
+        </div>
+        <div style="background:#e8f5e9;color:#2e7d32;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">✅ Verified</div>
+      </div>
+      <div style="padding:14px;border-bottom:1px solid #f0f0f5;display:flex;gap:12px;align-items:center;">
+        <div style="width:42px;height:42px;border-radius:12px;background:#fce4ec;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📕</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:2px;">Fine-tune Llama 3 on Kannada</div>
+          <div style="font-size:11px;color:#aaa;">by Ravi K. · Python · 31 cells</div>
+        </div>
+        <div style="background:#f0f0ff;color:#6366f1;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">⚡ New</div>
+      </div>
+      <div style="padding:14px;display:flex;gap:12px;align-items:center;">
+        <div style="width:42px;height:42px;border-radius:12px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">📗</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:2px;">Telugu NLP — Tokenisation Guide</div>
+          <div style="font-size:11px;color:#aaa;">by Meena R. · Python · 16 cells</div>
+        </div>
+        <div style="background:#e8f5e9;color:#2e7d32;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;">✅ Verified</div>
+      </div>
+    </div>`
+};
+
+function libraryFilter(type, el) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  const box = document.getElementById('library-content');
+  box.style.opacity = 0;
+  setTimeout(() => {
+    box.innerHTML = libraryContent[type];
+    box.style.transition = 'opacity 0.2s';
+    box.style.opacity = 1;
+  }, 120);
+}
+
+// Library init handled in window.onload below
+
+// ── Create tab content ──
+const createContent = {
+  text: `
+    <div class="compose">
+      <textarea id="compose-ta" placeholder="Share your idea, insight, or update… Hinglish welcome 🇮🇳" rows="4" oninput="onComposeInput()"></textarea>
+      <div class="ctoolbar">
+        <span class="ctool">📸</span>
+        <span class="ctool">🔗</span>
+        <span id="char-count" style="font-size:11px;color:#bbb;margin-left:auto;margin-right:8px;">0 / 3000</span>
+        <button class="publish-btn">Publish</button>
+      </div>
+    </div>
+
+    <!-- AI Idea Analyser trigger -->
+    <div id="analyse-trigger" style="display:none;margin:0 16px 12px;">
+      <button onclick="runIdeaAnalysis()" style="width:100%;padding:12px;border-radius:14px;border:1.5px dashed #6366f1;background:#f8f8ff;color:#6366f1;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Inter',sans-serif;">
+        🧠 Analyse My Idea with AI
+      </button>
+    </div>
+
+    <!-- AI Analysis Result (hidden initially) -->
+    <div id="idea-analysis" style="display:none;margin:0 16px 12px;">
+      <div style="background:#fff;border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.07);border-top:3px solid #6366f1;">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-size:12px;font-weight:700;color:#6366f1;letter-spacing:1px;text-transform:uppercase;">✦ AI Idea Analysis</div>
+          <div id="idea-score-badge" style="font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,#6366f1,#FF9933);padding:4px 14px;border-radius:99px;">8.4 / 10</div>
+        </div>
+
+        <!-- Score bars -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:12px;color:#555;font-weight:500;">💡 Originality</span>
+              <span class="idea-score-val" style="font-size:12px;font-weight:700;color:#111;">8 / 10</span>
+            </div>
+            <div style="height:6px;background:#f0f0f5;border-radius:3px;overflow:hidden;">
+              <div class="idea-bar" style="height:100%;width:80%;background:linear-gradient(90deg,#6366f1,#a5b4fc);border-radius:3px;transition:width .5s;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:12px;color:#555;font-weight:500;">🎯 Relevance to IndiaAI</span>
+              <span class="idea-score-val" style="font-size:12px;font-weight:700;color:#111;">9 / 10</span>
+            </div>
+            <div style="height:6px;background:#f0f0f5;border-radius:3px;overflow:hidden;">
+              <div class="idea-bar" style="height:100%;width:90%;background:linear-gradient(90deg,#FF9933,#fbbf24);border-radius:3px;transition:width .5s;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:12px;color:#555;font-weight:500;">🔥 Engagement Potential</span>
+              <span class="idea-score-val" style="font-size:12px;font-weight:700;color:#111;">7 / 10</span>
+            </div>
+            <div style="height:6px;background:#f0f0f5;border-radius:3px;overflow:hidden;">
+              <div class="idea-bar" style="height:100%;width:70%;background:linear-gradient(90deg,#f43f5e,#fb7185);border-radius:3px;transition:width .5s;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:12px;color:#555;font-weight:500;">📚 Technical Depth</span>
+              <span class="idea-score-val" style="font-size:12px;font-weight:700;color:#111;">9 / 10</span>
+            </div>
+            <div style="height:6px;background:#f0f0f5;border-radius:3px;overflow:hidden;">
+              <div class="idea-bar" style="height:100%;width:90%;background:linear-gradient(90deg,#22c55e,#86efac);border-radius:3px;transition:width .5s;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Verdict -->
+        <div style="background:#f8f8ff;border-radius:12px;padding:11px 13px;margin-bottom:12px;">
+          <div style="font-size:11px;color:#6366f1;font-weight:700;margin-bottom:4px;">AI Verdict</div>
+          <div id="idea-verdict" style="font-size:13px;color:#333;line-height:1.55;">Strong idea with solid IndiaAI relevance. Add a concrete example or metric to boost engagement by ~40%. Consider posting as a <b>thread</b> for better reach.</div>
+        </div>
+
+        <!-- Suggestions -->
+        <div style="font-size:11px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">AI Improvements</div>
+        <div id="ai-improved-text" style="background:#f0f0ff;border:1px solid #ddd5ff;border-radius:12px;padding:11px 13px;font-size:13px;color:#333;line-height:1.6;margin-bottom:10px;cursor:pointer;" onclick="applyImprovement()">
+          💡 Tap to use AI-improved version →
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="applyImprovement()" style="flex:1;padding:9px;border-radius:12px;background:#6366f1;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Use Improved ✓</button>
+          <button onclick="closeAnalysis()" style="flex:1;padding:9px;border-radius:12px;background:#f0f0f5;color:#555;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Keep Mine</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-box">
+      <div class="ai-label">✦ AI Caption Suggestions</div>
+      <div class="sug" onclick="fillText(this)">🚀 Just ran IndicBERT on Tamil data — 91% F1! Sharing full config for the community. #IndiaAI</div>
+      <div class="sug" onclick="fillText(this)">💡 Hot take: The best AI builders write prompts in their mother tongue. Indic models are catching up fast 🇮🇳</div>
+      <div class="sug" onclick="fillText(this)">🧵 3 things I learned building a Hindi chatbot this week — a thread for every beginner.</div>
+    </div>
+    <div class="section-label">Schedule</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 14px;">
+      <div style="background:#fff;border-radius:14px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <div style="font-size:11px;color:#aaa;margin-bottom:3px;">Date</div>
+        <div style="font-size:14px;font-weight:600;color:#111;">Feb 22, 2026</div>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <div style="font-size:11px;color:#aaa;margin-bottom:3px;">Best Time</div>
+        <div style="font-size:14px;font-weight:700;color:#FF9933;">7:30 PM IST</div>
+      </div>
+    </div>`,
+
+  prompt: `
+    <div class="compose">
+      <textarea placeholder='Write your prompt here… e.g. "Summarise {{text}} in Hindi in 3 points"' rows="4"></textarea>
+      <div class="ctoolbar">
+        <span class="ctool" title="Add variable">﹛﹜</span>
+        <span class="ctool">🔗</span>
+        <span style="font-size:11px;color:#bbb;margin-left:auto;margin-right:8px;">0 / 2000</span>
+        <button class="publish-btn" style="background:#6366f1;">Share</button>
+      </div>
+    </div>
+    <div style="margin:0 16px 12px;background:#fff;border-radius:18px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-size:12px;font-weight:700;color:#6366f1;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Prompt Settings</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#444;">Language</span>
+          <select style="border:1px solid #eee;border-radius:8px;padding:5px 10px;font-size:13px;color:#111;background:#f8f8fc;outline:none;">
+            <option>Hindi</option><option>Tamil</option><option>Kannada</option><option>Telugu</option><option>English</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#444;">Model</span>
+          <select style="border:1px solid #eee;border-radius:8px;padding:5px 10px;font-size:13px;color:#111;background:#f8f8fc;outline:none;">
+            <option>IndicBERT</option><option>GPT-4o</option><option>Gemini 1.5</option><option>Llama 3</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#444;">Visibility</span>
+          <select style="border:1px solid #eee;border-radius:8px;padding:5px 10px;font-size:13px;color:#111;background:#f8f8fc;outline:none;">
+            <option>Public</option><option>Followers</option><option>Private</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="ai-box">
+      <div class="ai-label">✦ Prompt Templates</div>
+      <div class="sug">"Summarise {{text}} in {{language}} in 3 bullet points under 15 words each."</div>
+      <div class="sug">"Classify the sentiment of {{input}} as positive, negative, or neutral. Return JSON."</div>
+      <div class="sug">"Translate {{text}} from English to Hindi keeping technical terms in English."</div>
+    </div>`,
+
+  video: `
+    <div style="margin:0 16px 12px;">
+      <div style="background:#fff;border-radius:18px;padding:24px 16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);text-align:center;border:2px dashed #eee;cursor:pointer;" onclick="this.style.borderColor='#FF9933'">
+        <div style="font-size:36px;margin-bottom:10px;">🎬</div>
+        <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:4px;">Upload your video</div>
+        <div style="font-size:12px;color:#aaa;">MP4, MOV up to 500MB</div>
+        <div style="margin-top:14px;display:inline-block;background:#FF9933;color:#fff;padding:8px 22px;border-radius:20px;font-size:13px;font-weight:600;">Browse Files</div>
+      </div>
+    </div>
+    <div class="compose">
+      <textarea placeholder="Add a title and description for your video…" rows="3"></textarea>
+      <div class="ctoolbar">
+        <span class="ctool">🏷️</span>
+        <span class="ctool">🔗</span>
+        <button class="publish-btn">Upload</button>
+      </div>
+    </div>
+    <div style="margin:0 16px 12px;background:#fff;border-radius:18px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-size:12px;font-weight:700;color:#6366f1;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Video Settings</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#444;">Language</span>
+          <select style="border:1px solid #eee;border-radius:8px;padding:5px 10px;font-size:13px;color:#111;background:#f8f8fc;outline:none;">
+            <option>Hindi</option><option>Tamil</option><option>Kannada</option><option>Telugu</option><option>English</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#444;">Category</span>
+          <select style="border:1px solid #eee;border-radius:8px;padding:5px 10px;font-size:13px;color:#111;background:#f8f8fc;outline:none;">
+            <option>Tutorial</option><option>Demo</option><option>Discussion</option><option>News</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#444;">Auto Captions</span>
+          <div onclick="this.classList.toggle('tog-on');this.style.background=this.classList.contains('tog-on')?'#FF9933':'#eee'" style="width:40px;height:22px;border-radius:11px;background:#eee;cursor:pointer;transition:background .2s;position:relative;">
+            <div style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+          </div>
+        </div>
+      </div>
+    </div>`,
+
+  poll: `
+    <div style="margin:0 16px 12px;background:#fff;border-radius:18px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-size:12px;font-weight:700;color:#6366f1;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Poll Question</div>
+      <textarea placeholder="Ask the community something… e.g. Which Indic model do you use most?" rows="2" style="width:100%;background:#f8f8fc;border:none;border-radius:12px;padding:12px;font-family:'Inter',sans-serif;font-size:14px;color:#111;line-height:1.5;resize:none;outline:none;"></textarea>
+    </div>
+    <div style="margin:0 16px 12px;background:#fff;border-radius:18px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05);" id="poll-options">
+      <div style="font-size:12px;font-weight:700;color:#6366f1;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Options</div>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="poll-opts">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#f0f0ff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#6366f1;flex-shrink:0;">A</div>
+          <input placeholder="Option A" style="flex:1;background:#f8f8fc;border:none;border-radius:10px;padding:10px 12px;font-size:13px;color:#111;outline:none;font-family:'Inter',sans-serif;">
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#f0f0ff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#6366f1;flex-shrink:0;">B</div>
+          <input placeholder="Option B" style="flex:1;background:#f8f8fc;border:none;border-radius:10px;padding:10px 12px;font-size:13px;color:#111;outline:none;font-family:'Inter',sans-serif;">
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#f0f0ff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#6366f1;flex-shrink:0;">C</div>
+          <input placeholder="Option C" style="flex:1;background:#f8f8fc;border:none;border-radius:10px;padding:10px 12px;font-size:13px;color:#111;outline:none;font-family:'Inter',sans-serif;">
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#f0f0ff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#6366f1;flex-shrink:0;">D</div>
+          <input placeholder="Option D" style="flex:1;background:#f8f8fc;border:none;border-radius:10px;padding:10px 12px;font-size:13px;color:#111;outline:none;font-family:'Inter',sans-serif;">
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 16px 6px;">
+      <button id="add-opt-btn" onclick="addPollOption()" style="width:100%;padding:10px;border-radius:12px;border:1.5px dashed #6366f1;background:transparent;color:#6366f1;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">+ Add Option (max 6)</button>
+    </div>
+    <div style="margin:0 16px 12px;background:#fff;border-radius:18px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+      <div style="font-size:12px;font-weight:700;color:#6366f1;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Poll Settings</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#444;">Duration</span>
+          <select style="border:1px solid #eee;border-radius:8px;padding:5px 10px;font-size:13px;color:#111;background:#f8f8fc;outline:none;">
+            <option>1 Day</option><option>3 Days</option><option>1 Week</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:#444;">Anonymous</span>
+          <div onclick="this.classList.toggle('tog-on');this.style.background=this.classList.contains('tog-on')?'#FF9933':'#eee'" style="width:40px;height:22px;border-radius:11px;background:#eee;cursor:pointer;transition:background .2s;">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 16px 14px;">
+      <button class="publish-btn" style="width:100%;padding:14px;border-radius:14px;font-size:14px;">📊 Publish Poll</button>
+    </div>`
+};
+
+function createFilter(type, el) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  if (type === 'poll') pollOptCount = 4;
+  const box = document.getElementById('create-content');
+  box.style.opacity = 0;
+  setTimeout(() => {
+    box.innerHTML = createContent[type];
+    box.style.transition = 'opacity 0.2s';
+    box.style.opacity = 1;
+  }, 120);
+}
+
+function fillText(el) {
+  const ta = document.querySelector('#create-content textarea');
+  if (ta) { ta.value = el.innerText.replace(/^[🚀💡🧵]\s*/,''); onComposeInput(); }
+}
+
+// ── Idea Analyser ──
+function onComposeInput() {
+  const ta = document.getElementById('compose-ta');
+  const trigger = document.getElementById('analyse-trigger');
+  const counter = document.getElementById('char-count');
+  if (!ta) return;
+  const len = ta.value.length;
+  if (counter) counter.textContent = len + ' / 3000';
+  if (trigger) trigger.style.display = len > 20 ? 'block' : 'none';
+  // hide old analysis if user edits
+  const panel = document.getElementById('idea-analysis');
+  if (panel) panel.style.display = 'none';
+}
+
+const ideaProfiles = [
+  {
+    score: '8.4', originality: 80, relevance: 90, engagement: 70, depth: 90,
+    verdict: 'Strong idea with solid IndiaAI relevance. Add a concrete metric or result to boost engagement by ~40%. Try posting as a <b>thread</b> for better reach.',
+    improved: '🚀 Fine-tuned IndicBERT on Tamil legal NER — hit 91% F1 with just 2K examples. Here\'s the exact config that worked (and what failed). #IndiaAI #IndicNLP'
+  },
+  {
+    score: '7.1', originality: 65, relevance: 75, engagement: 80, depth: 55,
+    verdict: 'Good engagement hook but needs more technical substance. Add a specific result, dataset name, or comparison to strengthen credibility.',
+    improved: '💡 Tested 4 Indic models on the same Hindi dataset — IndicBERT won by 12% F1 over mBERT. Here\'s why mother-tongue prompting matters more than model size. 🇮🇳'
+  },
+  {
+    score: '9.2', originality: 95, relevance: 92, engagement: 88, depth: 92,
+    verdict: 'Excellent idea — highly original and deeply relevant to the Indic AI community. Post immediately at 7:30 PM IST for maximum reach.',
+    improved: '🧵 3 things nobody tells you about building Hindi chatbots: (1) Tokenisation breaks at 40% of common words (2) Transliteration ≠ translation (3) IndicBERT beats GPT-4 on local slang. Thread 👇'
+  }
+];
+
+function runIdeaAnalysis() {
+  const ta = document.getElementById('compose-ta');
+  const panel = document.getElementById('idea-analysis');
+  const btn = document.getElementById('analyse-trigger').querySelector('button');
+  if (!ta || !panel) return;
+
+  // Loading state
+  btn.innerHTML = '<span style="animation:spin 1s linear infinite;display:inline-block;">⏳</span> Analysing with AI…';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    const profile = ideaProfiles[Math.floor(Math.random() * ideaProfiles.length)];
+
+    // Update score badge
+    panel.querySelector('#idea-score-badge').textContent = profile.score + ' / 10';
+
+    // Update bars
+    const bars = panel.querySelectorAll('.idea-bar');
+    const vals = [profile.originality, profile.relevance, profile.engagement, profile.depth];
+    bars.forEach((b, i) => b.style.width = vals[i] + '%');
+
+    // Update scores text
+    const scoreLabels = panel.querySelectorAll('.idea-score-val');
+    const rawVals = [profile.originality/10, profile.relevance/10, profile.engagement/10, profile.depth/10];
+    scoreLabels.forEach((s,i) => s.textContent = rawVals[i].toFixed(0) + ' / 10');
+
+    // Update verdict
+    panel.querySelector('#idea-verdict').innerHTML = profile.verdict;
+
+    // Update improved text
+    panel.querySelector('#ai-improved-text').setAttribute('data-improved', profile.improved);
+    panel.querySelector('#ai-improved-text').innerHTML = '💡 <i style="color:#6366f1;">' + profile.improved + '</i><br><span style="font-size:11px;color:#aaa;margin-top:4px;display:block;">Tap to use this version →</span>';
+
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    btn.innerHTML = '🧠 Analyse My Idea with AI';
+    btn.disabled = false;
+  }, 1600);
+}
+
+function applyImprovement() {
+  const ta = document.getElementById('compose-ta');
+  const improvedEl = document.getElementById('ai-improved-text');
+  if (!ta || !improvedEl) return;
+  ta.value = improvedEl.getAttribute('data-improved') || '';
+  document.getElementById('idea-analysis').style.display = 'none';
+  document.getElementById('analyse-trigger').style.display = 'none';
+  onComposeInput();
+}
+
+function closeAnalysis() {
+  const panel = document.getElementById('idea-analysis');
+  if (panel) panel.style.display = 'none';
+}
+
+// Create init handled in window.onload below
+
+// ── Meetup data
+const meetups = [
+  {
+    emoji: '🇮🇳', bg: 'gc',
+    badge: 'FREE', badgeStyle: 'background:#e8f5e9;color:#2e7d32;',
+    title: 'IndiaAI Community Summit',
+    date: 'Mar 1', time: '10 AM IST', location: '🌐 Online',
+    attendees: ['👩','🧑','👨'], count: '+1.2K going',
+    btnText: 'Join', btnStyle: '',
+    tags: ['all', 'online', 'free']
+  },
+  {
+    emoji: '🤖', bg: 'gd',
+    badge: '₹499', badgeStyle: 'background:#fce4ec;color:#c62828;',
+    title: 'GenAI Startup Pitch Night',
+    date: 'Mar 8', time: '5 PM IST', location: '📍 Bangalore',
+    attendees: ['🧑','👩'], count: '+340 going',
+    btnText: 'RSVP', btnStyle: 'background:#6366f1;',
+    tags: ['all', 'bangalore']
+  },
+  {
+    emoji: '🌿', bg: 'gb',
+    badge: 'FREE', badgeStyle: 'background:#e8f5e9;color:#2e7d32;',
+    title: 'Indic Language Models Workshop',
+    date: 'Mar 15', time: '3 PM IST', location: '🌐 Online',
+    attendees: ['🎓','👩'], count: '+678 going',
+    btnText: 'Join', btnStyle: '',
+    tags: ['all', 'online', 'free']
+  },
+  {
+    emoji: '🚀', bg: 'ga',
+    badge: 'FREE', badgeStyle: 'background:#e8f5e9;color:#2e7d32;',
+    title: 'Python × AI Builders Meetup',
+    date: 'Mar 20', time: '6 PM IST', location: '📍 Mumbai',
+    attendees: ['👨','🧑','👩'], count: '+210 going',
+    btnText: 'Join', btnStyle: '',
+    tags: ['all', 'mumbai', 'free']
+  },
+  {
+    emoji: '🧠', bg: 'ge',
+    badge: '₹199', badgeStyle: 'background:#fce4ec;color:#c62828;',
+    title: 'Prompt Engineering Bootcamp',
+    date: 'Mar 22', time: '11 AM IST', location: '📍 Bangalore',
+    attendees: ['👩','🧑'], count: '+155 going',
+    btnText: 'RSVP', btnStyle: 'background:#6366f1;',
+    tags: ['all', 'bangalore']
+  },
+  {
+    emoji: '🎓', bg: 'gd',
+    badge: 'FREE', badgeStyle: 'background:#e8f5e9;color:#2e7d32;',
+    title: 'EduPulse × Sianap AI Mentorship',
+    date: 'Mar 28', time: '7 PM IST', location: '🌐 Online',
+    attendees: ['👨','👩','🧑'], count: '+900 going',
+    btnText: 'Join', btnStyle: '',
+    tags: ['all', 'online', 'free']
+  }
+];
+
+function renderMeetups(filter) {
+  const list = document.getElementById('meetup-list');
+  const filtered = meetups.filter(m => m.tags.includes(filter));
+  if (filtered.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#aaa;font-size:14px;">No meetups found for this filter.</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(m => `
+    <div class="mcard">
+      <div class="mcov ${m.bg}">${m.emoji}<div class="mbadge" style="${m.badgeStyle}">${m.badge}</div></div>
+      <div class="mbody">
+        <div class="mtitle">${m.title}</div>
+        <div class="mmeta"><span>📅 ${m.date}</span><span>🕙 ${m.time}</span><span>${m.location}</span></div>
+        <div class="mfoot">
+          <div class="atts">
+            <div class="att-emojis">
+              ${m.attendees.map((a,i) => `<div class="att-e g${['a','b','c'][i%3]}">${a}</div>`).join('')}
+            </div>
+            <div class="att-count" style="margin-left:6px;">${m.count}</div>
+          </div>
+          <button class="join-btn" style="${m.btnStyle}">${m.btnText}</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function meetupFilter(filter, el) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  renderMeetups(filter);
+}
+
+
+// ══════════════════════════════════════
+// PROFILE MODAL SYSTEM
+// ══════════════════════════════════════
+const modalContents = {
+
+  editProfile: () => `
+    <div style="padding:20px 20px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="font-size:18px;font-weight:800;color:#111;">Edit Profile</span>
+        <span onclick="closeModal()" style="font-size:22px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#FF9933);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;margin:0 auto 8px;" id="modal-avatar-preview">AS</div>
+        <div style="font-size:13px;color:#6366f1;font-weight:600;cursor:pointer;">Change Photo</div>
+      </div>
+      ${mField('Full Name','ep-name','text',document.getElementById('display-name')?.textContent||'Amandeep Singh')}
+      ${mField('Username','ep-user','text','amandeepsingh')}
+      ${mField('Email','ep-email','email','amandeep@sianap.ai')}
+      ${mField('Bio','ep-bio','text','AI Builder · Bangalore 🇮🇳')}
+      ${mField('Location','ep-loc','text','Bangalore, Karnataka')}
+      ${mField('Website','ep-web','url','https://sianap.ai')}
+      <button onclick="saveProfile()" style="width:100%;padding:14px;border-radius:14px;background:#6366f1;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;">Save Changes</button>
+    </div>`,
+
+  notifications: () => `
+    <div style="padding:20px 20px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="font-size:18px;font-weight:800;color:#111;">🔔 Notifications</span>
+        <span onclick="closeModal()" style="font-size:22px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+      ${mToggleRow('Likes on my posts', true)}
+      ${mToggleRow('Comments on my posts', true)}
+      ${mToggleRow('New followers', true)}
+      ${mToggleRow('Prompt runs & saves', true)}
+      ${mToggleRow('Trending posts in my field', false)}
+      ${mToggleRow('Weekly summary email', true)}
+      ${mToggleRow('Product updates from Sianap', false)}
+      ${mToggleRow('Push notifications', true)}
+    </div>`,
+
+  language: () => `
+    <div style="padding:20px 20px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="font-size:18px;font-weight:800;color:#111;">🌐 Language & Region</span>
+        <span onclick="closeModal()" style="font-size:22px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">App Language</div>
+      ${[['en','🌐 English','English'],['hi','🇮🇳 हिंदी','Hindi'],['pa','☬ ਪੰਜਾਬੀ','Punjabi'],['ta','🌺 தமிழ்','Tamil'],['kn','🌸 ಕನ್ನಡ','Kannada'],['te','🌻 తెలుగు','Telugu'],['mr','🌼 मराठी','Marathi']].map(([code,label,name])=>`
+        <div onclick="setAppLanguage('${code}','${name}')" style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:12px;cursor:pointer;margin-bottom:4px;background:${currentLang===code?'#f0f0ff':'#f8f8fc'};">
+          <span style="font-size:16px;">${label}</span>
+          <span style="flex:1;font-size:14px;color:#111;font-weight:500;">${name}</span>
+          ${currentLang===code?'<span style="color:#6366f1;font-size:18px;">✓</span>':''}
+        </div>`).join('')}
+      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin:16px 0 10px;">Region</div>
+      ${mSelect('Time Zone','tz',['IST — India Standard Time','GST — Gulf Standard Time','EST — Eastern (US)'])}
+      ${mSelect('Date Format','df',['DD/MM/YYYY','MM/DD/YYYY','YYYY-MM-DD'])}
+    </div>`,
+
+  appearance: () => `
+    <div style="padding:20px 20px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="font-size:18px;font-weight:800;color:#111;">🎨 Appearance</span>
+        <span onclick="closeModal()" style="font-size:22px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Theme</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+        <div onclick="setTheme('light')" id="theme-light" style="border:2px solid #6366f1;border-radius:14px;padding:14px;text-align:center;cursor:pointer;background:#fff;">
+          <div style="font-size:24px;margin-bottom:4px;">☀️</div><div style="font-size:13px;font-weight:600;color:#111;">Light</div>
+        </div>
+        <div onclick="setTheme('dark')" id="theme-dark" style="border:2px solid #eee;border-radius:14px;padding:14px;text-align:center;cursor:pointer;background:#1c1c2a;">
+          <div style="font-size:24px;margin-bottom:4px;">🌙</div><div style="font-size:13px;font-weight:600;color:#e8e8f4;">Dark</div>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Accent Color</div>
+      <div style="display:flex;gap:10px;margin-bottom:20px;">
+        ${['#6366f1','#FF9933','#f43f5e','#22c55e','#0891b2','#8b5cf6'].map(c=>`<div onclick="document.querySelectorAll('.btn-run').forEach(b=>b.style.background='${c}')" style="width:36px;height:36px;border-radius:50%;background:${c};cursor:pointer;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.15);"></div>`).join('')}
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Font Size</div>
+      ${mSelect('Text Size','font-size',['Small (13px)','Medium (15px) — Default','Large (17px)'])}
+    </div>`,
+
+  privacy: () => `
+    <div style="padding:20px 20px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="font-size:18px;font-weight:800;color:#111;">🔒 Privacy Settings</span>
+        <span onclick="closeModal()" style="font-size:22px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+      ${mToggleRow('Private Account', false)}
+      ${mToggleRow('Show online status', true)}
+      ${mToggleRow('Allow others to tag me', true)}
+      ${mToggleRow('Allow DMs from non-followers', false)}
+      ${mToggleRow('Show in search results', true)}
+      ${mToggleRow('Allow AI to train on my posts', false)}
+      <div style="margin-top:16px;padding:12px 14px;background:#fff3e0;border-radius:12px;font-size:12px;color:#e65100;line-height:1.5;">
+        ⚠️ Enabling private account means only approved followers can see your posts.
+      </div>
+    </div>`,
+
+  whoCanSee: () => `
+    <div style="padding:20px 20px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="font-size:18px;font-weight:800;color:#111;">👁️ Who Can See My Posts</span>
+        <span onclick="closeModal()" style="font-size:22px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+      ${[['everyone','🌍 Everyone','Visible to all Sianap users'],['followers','👥 Followers Only','Only people who follow you'],['closeFriends','⭐ Close Friends','A curated list of connections'],['onlyMe','🔐 Only Me','Completely private']].map(([val,title,desc])=>`
+        <div onclick="setVisibility('${val}','${title.replace(/[^ -~]/g,'').trim()}')" style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;cursor:pointer;margin-bottom:8px;background:#f8f8fc;border:2px solid ${document.getElementById('visibility-display')?.textContent===title.replace(/[^ -~]/g,'').trim()?'#6366f1':'transparent'};">
+          <span style="font-size:20px;">${title.split(' ')[0]}</span>
+          <div><div style="font-size:14px;font-weight:600;color:#111;">${title.split(' ').slice(1).join(' ')}</div><div style="font-size:12px;color:#aaa;">${desc}</div></div>
+        </div>`).join('')}
+    </div>`,
+
+  blocked: () => `
+    <div style="padding:20px 20px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="font-size:18px;font-weight:800;color:#111;">🚫 Blocked Accounts</span>
+        <span onclick="closeModal()" style="font-size:22px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+      <input placeholder="🔍  Search blocked users…" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid #eee;background:#f8f8fc;font-size:14px;outline:none;margin-bottom:14px;font-family:'Inter',sans-serif;">
+      ${[['SP','#f43f5e','SpamBot99','@spambot99'],['TX','#FF9933','TrollX','@trollx_anon'],['BF','#8b5cf6','BadFaith','@badfaith_dev']].map(([av,col,name,handle])=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f5;">
+          <div style="width:40px;height:40px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">${av}</div>
+          <div style="flex:1;"><div style="font-size:14px;font-weight:600;color:#111;">${name}</div><div style="font-size:12px;color:#aaa;">${handle}</div></div>
+          <button onclick="this.textContent=this.textContent==='Unblock'?'Block':'Unblock'" style="padding:6px 14px;border-radius:20px;border:1px solid #f43f5e;background:transparent;color:#f43f5e;font-size:12px;font-weight:600;cursor:pointer;">Unblock</button>
+        </div>`).join('')}
+      <button style="width:100%;padding:12px;border-radius:12px;background:#f8f8fc;color:#6366f1;border:1px dashed #6366f1;font-size:13px;font-weight:600;cursor:pointer;margin-top:14px;">+ Block a user</button>
+    </div>`,
+
+  helpCenter: () => `
+    <div style="padding:20px 20px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="font-size:18px;font-weight:800;color:#111;">❓ Help Center</span>
+        <span onclick="closeModal()" style="font-size:22px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+      <input placeholder="🔍  Search help articles…" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid #eee;background:#f8f8fc;font-size:14px;outline:none;margin-bottom:14px;font-family:'Inter',sans-serif;">
+      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Popular Topics</div>
+      ${[['🚀','Getting started with Sianap'],['⚡','How to run & save prompts'],['🔒','Privacy and security'],['💳','Billing & subscriptions'],['🇮🇳','Indic language features'],['📊','Understanding analytics'],['🔔','Managing notifications'],['🐛','Report a bug']].map(([icon,topic])=>`
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;cursor:pointer;margin-bottom:6px;background:#f8f8fc;">
+          <span style="font-size:18px;">${icon}</span><span style="font-size:14px;color:#111;font-weight:500;">${topic}</span><span style="margin-left:auto;color:#ccc;">›</span>
+        </div>`).join('')}
+      <div style="margin-top:14px;padding:14px;background:linear-gradient(135deg,#f0f0ff,#fff3e0);border-radius:14px;text-align:center;">
+        <div style="font-size:14px;font-weight:700;color:#111;margin-bottom:4px;">Still need help?</div>
+        <div style="font-size:12px;color:#888;margin-bottom:10px;">Our support team replies within 2 hours</div>
+        <button style="padding:8px 20px;border-radius:20px;background:#6366f1;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;">💬 Chat with Support</button>
+      </div>
+    </div>`,
+
+  feedback: () => `
+    <div style="padding:20px 20px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <span style="font-size:18px;font-weight:800;color:#111;">📝 Send Feedback</span>
+        <span onclick="closeModal()" style="font-size:22px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Type</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        ${[['💡','Idea'],['🐛','Bug'],['😍','Praise'],['🤔','Question']].map(([icon,label])=>`<div onclick="this.parentElement.querySelectorAll('div').forEach(d=>d.style.borderColor='#eee');this.style.borderColor='#6366f1'" style="flex:1;text-align:center;padding:10px 6px;border-radius:12px;border:2px solid #eee;cursor:pointer;"><div style="font-size:20px;">${icon}</div><div style="font-size:11px;font-weight:600;color:#555;margin-top:3px;">${label}</div></div>`).join('')}
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Your Feedback</div>
+      <textarea id="fb-text" placeholder="Tell us what's on your mind. Every word counts! 🙏" rows="5" style="width:100%;padding:12px;border-radius:12px;border:1px solid #eee;background:#f8f8fc;font-size:14px;font-family:'Inter',sans-serif;outline:none;resize:none;margin-bottom:12px;"></textarea>
+      ${mField('Your Email (optional)','fb-email','email','amandeep@sianap.ai')}
+      <button onclick="submitFeedback()" style="width:100%;padding:14px;border-radius:14px;background:#6366f1;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px;">Send Feedback 🚀</button>
+    </div>`,
+
+  rateApp: () => `
+    <div style="padding:20px 20px 0;text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;text-align:left;">
+        <span style="font-size:18px;font-weight:800;color:#111;">⭐ Rate Sianap</span>
+        <span onclick="closeModal()" style="font-size:22px;color:#aaa;cursor:pointer;">✕</span>
+      </div>
+      <div style="font-size:52px;margin:10px 0;">🙏</div>
+      <div style="font-size:16px;font-weight:700;color:#111;margin-bottom:6px;">Enjoying Sianap?</div>
+      <div style="font-size:13px;color:#888;margin-bottom:20px;">Your rating helps us reach more AI builders across India</div>
+      <div id="star-row" style="display:flex;justify-content:center;gap:8px;margin-bottom:20px;">
+        ${[1,2,3,4,5].map(i=>`<div onclick="rateStar(${i})" id="star-${i}" style="font-size:36px;cursor:pointer;transition:transform .15s;">★</div>`).join('')}
+      </div>
+      <textarea id="rate-comment" placeholder="Tell us more… (optional)" rows="3" style="width:100%;padding:12px;border-radius:12px;border:1px solid #eee;background:#f8f8fc;font-size:14px;font-family:'Inter',sans-serif;outline:none;resize:none;margin-bottom:12px;"></textarea>
+      <button onclick="submitRating()" style="width:100%;padding:14px;border-radius:14px;background:#FF9933;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;">Submit Rating ⭐</button>
+    </div>`,
+
+  logout: () => `
+    <div style="padding:20px 20px 0;text-align:center;">
+      <div style="font-size:48px;margin:10px 0 12px;">👋</div>
+      <div style="font-size:18px;font-weight:800;color:#111;margin-bottom:8px;">Log Out?</div>
+      <div style="font-size:14px;color:#888;margin-bottom:24px;">You'll need to sign in again to access your account.</div>
+      <button onclick="closeModal();alert('See you soon, Amandeep! 👋')" style="width:100%;padding:14px;border-radius:14px;background:#fce4ec;color:#c62828;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;">🚪 Yes, Log Out</button>
+      <button onclick="closeModal()" style="width:100%;padding:14px;border-radius:14px;background:#f8f8fc;color:#555;border:none;font-size:15px;font-weight:600;cursor:pointer;">Cancel</button>
+    </div>`
+};
+
+// Modal helpers
+function mField(label, id, type, value) {
+  return `<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:700;color:#aaa;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;">${label}</div><input id="${id}" type="${type}" value="${value}" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid #eee;background:#f8f8fc;font-size:14px;font-family:'Inter',sans-serif;outline:none;color:#111;"></div>`;
+}
+function mToggleRow(label, on) {
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #f0f0f5;"><span style="font-size:14px;color:#111;font-weight:500;">${label}</span><div onclick="toggleSwitch(this)" ${on?'class="sw-on"':''} style="width:42px;height:24px;border-radius:12px;background:${on?'#6366f1':'#eee'};cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;"><div style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;${on?'right:2px':'left:2px'};box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:all .2s;"></div></div></div>`;
+}
+function mSelect(label, id, options) {
+  return `<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:700;color:#aaa;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;">${label}</div><select id="${id}" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid #eee;background:#f8f8fc;font-size:14px;font-family:'Inter',sans-serif;outline:none;color:#111;">${options.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+}
+
+function openModal(type) {
+  const overlay = document.getElementById('modal-overlay');
+  const sheet = document.getElementById('modal-sheet');
+  const content = document.getElementById('modal-content');
+  if (!overlay || !sheet || !content) return;
+  const builder = modalContents[type];
+  if (!builder) return;
+  content.innerHTML = builder();
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => { sheet.style.transform = 'translateY(0)'; });
+  // Init star colors for rateApp
+  if (type === 'rateApp') resetStars(0);
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modal-overlay');
+  const sheet = document.getElementById('modal-sheet');
+  if (!overlay || !sheet) return;
+  sheet.style.transform = 'translateY(100%)';
+  setTimeout(() => { overlay.style.display = 'none'; }, 320);
+}
+
+function saveProfile() {
+  const name = document.getElementById('ep-name')?.value?.trim();
+  const user = document.getElementById('ep-user')?.value?.trim();
+  if (name) { const n = document.getElementById('display-name'); if(n) n.textContent = name; document.getElementById('profile-avatar').textContent = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+  if (user) { const h = document.getElementById('display-handle'); if(h) h.textContent = '@'+user+' · AI Builder · Bangalore 🇮🇳'; }
+  closeModal();
+}
+
+function setAppLanguage(code, name) {
+  currentLang = code;
+  const el = document.getElementById('lang-display');
+  if (el) el.textContent = name;
+  const sel = document.getElementById('langSelect');
+  if (sel) sel.value = code;
+  setLang(code);
+  closeModal();
+}
+
+function setVisibility(val, label) {
+  const el = document.getElementById('visibility-display');
+  if (el) el.textContent = label;
+  closeModal();
+}
+
+function setTheme(mode) {
+  if (mode === 'dark' && !isDark) toggleDark();
+  else if (mode === 'light' && isDark) toggleDark();
+  closeModal();
+}
+
+let currentRating = 0;
+function rateStar(n) {
+  currentRating = n;
+  resetStars(n);
+}
+function resetStars(n) {
+  for (let i = 1; i <= 5; i++) {
+    const s = document.getElementById('star-'+i);
+    if (s) { s.style.color = i <= n ? '#FF9933' : '#ddd'; s.style.transform = i <= n ? 'scale(1.1)' : 'scale(1)'; }
+  }
+}
+function submitRating() {
+  if (!currentRating) { alert('Please select a star rating first!'); return; }
+  closeModal();
+  setTimeout(() => alert('Thank you for rating Sianap '+currentRating+'⭐! It means the world to us 🙏'), 400);
+}
+function submitFeedback() {
+  const text = document.getElementById('fb-text')?.value?.trim();
+  if (!text) { alert('Please write your feedback before submitting!'); return; }
+  closeModal();
+  setTimeout(() => alert('Thank you for your feedback! 🙏 We\'ll review it soon.'), 400);
+}
+
+window.onload = function() {
+  renderFeed('all');
+  renderNews('all');
+  renderMeetups('all');
+
+  const schedChip = document.querySelector('#tab-calendar .chip');
+  if (schedChip) scheduleFilter('today', schedChip);
+
+  const statsChip = document.querySelector('#tab-analytics .chip');
+  if (statsChip) statsFilter('overview', statsChip);
+
+  const libChip = document.querySelector('#tab-images .chip');
+  if (libChip) libraryFilter('prompts', libChip);
+
+  const createChip = document.querySelector('#tab-post .chip');
+  if (createChip) createFilter('text', createChip);
+};
+
+
+</script>
+</body>
+</html>
